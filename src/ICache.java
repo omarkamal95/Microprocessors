@@ -4,6 +4,7 @@ public class ICache {
 	private String [][] content;
 	private String [] tag;
 	private int [] valid;
+	private int misses = 0,hits = 0;
 	
 
 	ICache(){
@@ -57,4 +58,29 @@ public class ICache {
 	public void setAccessTime(int accessTime) {
 		this.accessTime = accessTime;
 	}
+
+	public String[][] getContent() {
+		return content;
+	}
+
+	public void setContent(String[][] content) {
+		this.content = content;
+	}
+
+	public String[] getTag() {
+		return tag;
+	}
+
+	public void setTag(String[] tag) {
+		this.tag = tag;
+	}
+
+	public int[] getValid() {
+		return valid;
+	}
+
+	public void setValid(int[] valid) {
+		this.valid = valid;
+	}
+	
 }

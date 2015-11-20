@@ -1,14 +1,21 @@
 
 public class DCache {
 	private int size, bytesBlock, associativity, accessTime;
+	
 	// 1 = write back, 2 = write through
-	private int writePolicy;
+	private int writeHitPolicy;
+	
+	// 1 = Write Around 2 = Write Allocate
+	private int writeMissPolicy;
+	
 	// 1 = LRU, 2 = Random
 	private int replacementPolicy;
+	
 	private String [][] content;
 	private String [] tag;
-	private int [] valid;
+	private int [] valid, dirty;
 	private int bufferSize;
+	private int misses = 0,hits= 0;
 	
 
 	DCache(){
@@ -16,25 +23,33 @@ public class DCache {
 		bytesBlock = 0;
 		associativity = 0;
 		accessTime = 0;
-		writePolicy = 0;
+		writeHitPolicy = 0;
+		writeMissPolicy = 0;
 		content = new String[0][0];
 		tag = new String [0];
 		valid = new int [0];
 		bufferSize = 0;
 		replacementPolicy = 0;
+		dirty = new int [0];
 	}
 
-	DCache(int s, int b, int a, int t, int wp,int rp, int bs){
+	DCache(int s, int b, int a, int t, int whp, int wmp,int rp, int bs){
 		size = s;
 		bytesBlock = b;
 		associativity = a;
 		accessTime = t;
-		writePolicy = wp;
+		writeHitPolicy = whp;
+		writeMissPolicy = wmp;
 		content = new String [size/bytesBlock][bytesBlock];
 		tag = new String [size/bytesBlock];
 		valid = new int [size/bytesBlock];
 		replacementPolicy = rp;
-		bufferSize = bs;
+		if(writeHitPolicy == 1){
+			bufferSize = bs;
+		}
+		if (writeHitPolicy == 0){
+			dirty = new int [size/bytesBlock];
+		}
 	}
 
 	public int getSize() {
@@ -69,12 +84,36 @@ public class DCache {
 		this.accessTime = accessTime;
 	}
 
-	public int getWritePolicy() {
-		return writePolicy;
+	public int getMisses() {
+		return misses;
 	}
 
-	public void setWritePolicy(int writePolicy) {
-		this.writePolicy = writePolicy;
+	public void setMisses(int misses) {
+		this.misses = misses;
+	}
+
+	public int getHits() {
+		return hits;
+	}
+
+	public void setHits(int hits) {
+		this.hits = hits;
+	}
+
+	public int getWriteHitPolicy() {
+		return writeHitPolicy;
+	}
+
+	public void setWriteHitPolicy(int writeHitPolicy) {
+		this.writeHitPolicy = writeHitPolicy;
+	}
+
+	public int getWriteMissPolicy() {
+		return writeMissPolicy;
+	}
+
+	public void setWriteMissPolicy(int writeMissPolicy) {
+		this.writeMissPolicy = writeMissPolicy;
 	}
 
 	public String[][] getContent() {
@@ -115,6 +154,14 @@ public class DCache {
 
 	public void setBufferSize(int bufferSize) {
 		this.bufferSize = bufferSize;
+	}
+
+	public int[] getDirty() {
+		return dirty;
+	}
+
+	public void setDirty(int[] dirty) {
+		this.dirty = dirty;
 	}
 		
 	
