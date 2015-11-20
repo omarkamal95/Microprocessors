@@ -3,6 +3,10 @@ public class MainMemory {
 private String [] memory = new String[64*(2^10)];
 int accessTime = 0;
 
+MainMemory(){
+	accessTime = 0;
+}
+
 MainMemory(int time){
 	accessTime = time;
 }
