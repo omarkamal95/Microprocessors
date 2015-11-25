@@ -4,6 +4,7 @@ public class ICache {
 	private String [][] content;
 	private String [] tag;
 	private int [] valid;
+	private int index, offset;
 	private int misses = 0,hits = 0;
 	
 
@@ -25,6 +26,29 @@ public class ICache {
 		content = new String [size/bytesBlock][bytesBlock];
 		tag = new String [size/bytesBlock];
 		valid = new int [size/bytesBlock];
+	}
+	
+	public String find(int address){
+		String addr = Main.integerToBinary(address);
+		String addrIndex = addr.substring(addr.length() - index - offset, addr.length()- offset);
+		String addrOffset = addr.substring(addr.length() - offset, addr.length());
+		String addrTag = addr.substring(0, addr.length() - index - offset);
+		
+		
+		int intAddr = Main.binaryToInteger(addrIndex);
+		int intOffset = Main.binaryToInteger(addrOffset);
+		int startIndex = intAddr*associativity;
+		for(int i = 0; i< associativity; i++){
+			if(valid[startIndex] == 1){
+				if(tag[startIndex].equals(addrTag)){
+					return content[startIndex][intOffset];
+				}
+			}
+			startIndex ++;
+		}
+		return null;
+		
+		
 	}
 
 	public int getSize() {
@@ -81,6 +105,40 @@ public class ICache {
 
 	public void setValid(int[] valid) {
 		this.valid = valid;
+	}
+
+	
+
+	public int getIndex() {
+		return index;
+	}
+
+	public void setIndex(int index) {
+		this.index = index;
+	}
+
+	public int getOffset() {
+		return offset;
+	}
+
+	public void setOffset(int offset) {
+		this.offset = offset;
+	}
+
+	public int getMisses() {
+		return misses;
+	}
+
+	public void setMisses(int misses) {
+		this.misses = misses;
+	}
+
+	public int getHits() {
+		return hits;
+	}
+
+	public void setHits(int hits) {
+		this.hits = hits;
 	}
 	
 }

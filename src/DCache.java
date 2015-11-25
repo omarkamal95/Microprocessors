@@ -1,3 +1,6 @@
+import java.util.ArrayList;
+import java.util.Date;
+
 
 public class DCache {
 	private int size, bytesBlock, associativity, accessTime;
@@ -14,8 +17,9 @@ public class DCache {
 	private String [][] content;
 	private String [] tag;
 	private int [] valid, dirty;
-	private int bufferSize;
+	private int bufferSize, index, offset;
 	private int misses = 0,hits= 0;
+	private ArrayList<java.util.Date> lastUsed= new ArrayList<java.util.Date> ();
 	
 
 	DCache(){
@@ -50,6 +54,95 @@ public class DCache {
 		if (writeHitPolicy == 0){
 			dirty = new int [size/bytesBlock];
 		}
+		 index = (int) Math.ceil(Math.log10(size/bytesBlock)/Math.log10(2));
+		 offset = (int) Math.ceil(Math.log10(bytesBlock)/Math.log10(2));
+	}
+	
+	public void put(int address, String data){
+		String addr = Main.integerToBinary(address);
+		String addrIndex = addr.substring(addr.length() - index - offset, addr.length()- offset);
+		String addrOffset = addr.substring(addr.length() - offset, addr.length());
+		String addrTag = addr.substring(0, addr.length() - index - offset);
+		
+		int intAddr = Main.binaryToInteger(addrIndex);
+		int intOffset = Main.binaryToInteger(addrOffset);
+		int startIndex = intAddr*associativity;
+		
+		boolean added = false;
+		for(int i = 0; i< associativity; i++){
+			if(valid[startIndex] == 1){
+				if(tag[startIndex].equals(addrTag)){
+					content[startIndex][intOffset] =data;
+					added = true;
+					lastUsed.set(startIndex, new java.util.Date());
+				}
+			}
+			startIndex ++;
+		}
+		
+		if(!added){
+			startIndex = intAddr*associativity;
+			for(int i = 0; i< associativity; i++){
+				if(valid[startIndex] == 0){
+					tag[startIndex] = addrTag;
+					content [startIndex][intOffset] = data;
+					added = true;
+					lastUsed.set(startIndex, new java.util.Date());
+				}
+				startIndex ++;
+			}
+		}
+		
+		
+		startIndex = intAddr*associativity;
+		if(!added){
+			if(replacementPolicy == 1){
+				Date lastDate = lastUsed.get(startIndex);
+				int replaceInd = startIndex;
+				for(int i = 0; i< associativity; i++){
+					if(lastUsed.get(startIndex).compareTo(lastDate)<0){
+						lastDate = lastUsed.get(startIndex);
+						replaceInd = startIndex;
+					}
+					startIndex ++;
+				}
+				tag[replaceInd] = addrTag;
+				content [replaceInd][intOffset] = data;
+				added = true;
+				lastUsed.set(replaceInd, new java.util.Date());
+			}
+			else {
+				tag[startIndex] = addrTag;
+				content [startIndex][intOffset] = data;
+				added = true;
+				lastUsed.set(startIndex, new java.util.Date());
+			}
+		}
+		
+	}
+	
+	public String find(int address){
+		String addr = Main.integerToBinary(address);
+		String addrIndex = addr.substring(addr.length() - index - offset, addr.length()- offset);
+		String addrOffset = addr.substring(addr.length() - offset, addr.length());
+		String addrTag = addr.substring(0, addr.length() - index - offset);
+		
+		
+		int intAddr = Main.binaryToInteger(addrIndex);
+		int intOffset = Main.binaryToInteger(addrOffset);
+		int startIndex = intAddr*associativity;
+		for(int i = 0; i< associativity; i++){
+			if(valid[startIndex] == 1){
+				if(tag[startIndex].equals(addrTag)){
+					lastUsed.set(startIndex, new java.util.Date());
+					return content[startIndex][intOffset];
+				}
+			}
+			startIndex ++;
+		}
+		return null;
+		
+		
 	}
 
 	public int getSize() {
