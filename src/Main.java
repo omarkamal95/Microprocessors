@@ -1,4 +1,6 @@
 import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.Queue;
 
 
 public class Main {
@@ -7,38 +9,46 @@ public class Main {
 	final int R0 = 0;
 	DCache dcaches [];
 	ICache icaches [];
+	String [] instructionBuffer;
+	int instructionBufferCounter;
 
-	public void load(int address, int regNo){
+	public void load(int address, String regNo){
 		for(int i =0; i < dcaches.length;i++){
 			String data = dcaches[i].find(address);
 			if(data != null){
 				putInReg(data,regNo);
 				break;
 			}
+			/// dont know how to put blocks in cache if block size different
 		}
 	}
 	
-	public void putInReg(String data, int regNo){
+	public void fetch(){
+		
+	}
+	
+	
+	public void putInReg(String data, String regNo){
 		int intData = Integer.parseInt(data);
-		if(regNo == 1){
+		if(regNo.equalsIgnoreCase("R1")){
 			R1 = intData;
 		}
-		if(regNo == 2){
+		if(regNo.equalsIgnoreCase("R2")){
 			R2 = intData;
 		}
-		if(regNo == 3){
+		if(regNo.equalsIgnoreCase("R3")){
 			R3 = intData;
 		}
-		if(regNo == 4){
+		if(regNo.equalsIgnoreCase("R4")){
 			R4 = intData;
 		}
-		if(regNo == 5){
+		if(regNo.equalsIgnoreCase("R5")){
 			R5 = intData;
 		}
-		if(regNo == 6){
+		if(regNo.equalsIgnoreCase("R6")){
 			R6 = intData;
 		}
-		if(regNo == 7){
+		if(regNo.equalsIgnoreCase("R7")){
 			R7 = intData;
 		}
 	}
@@ -58,6 +68,16 @@ public class Main {
 			res = "0"+res;
 		}
 		return res;
+	}
+	
+	public void runCycle(){
+		if(instructionBufferCounter >0){
+			//issue
+		}
+		if(instructionBufferCounter < instructionBuffer.length){
+			fetch();
+		}
+		
 	}
 	
 	public static void main (String [] args){

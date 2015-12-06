@@ -58,6 +58,12 @@ public class DCache {
 		 offset = (int) Math.ceil(Math.log10(bytesBlock)/Math.log10(2));
 	}
 	
+	
+	private void write(int address, String data) {
+		
+
+	}
+	
 	public void put(int address, String data){
 		String addr = Main.integerToBinary(address);
 		String addrIndex = addr.substring(addr.length() - index - offset, addr.length()- offset);
