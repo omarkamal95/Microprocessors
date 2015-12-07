@@ -1,3 +1,4 @@
+package Main;
 
 public class ICache {
 	private int size, bytesBlock, associativity, accessTime;

@@ -1,3 +1,4 @@
+package Main;
 
 public class MainMemory {
 private String [] memory = new String[64*(2^10)];

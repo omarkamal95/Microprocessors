@@ -1,3 +1,4 @@
+package Main;
 import java.util.ArrayList;
 import java.util.Date;
 
@@ -37,13 +38,12 @@ public class DCache {
 		dirty = new int [0];
 	}
 
-	DCache(int s, int b, int a, int t, int whp, int wmp,int rp, int bs){
+	public DCache(int s, int b, int a, int t, int whp,int rp, int bs){
 		size = s;
 		bytesBlock = b;
 		associativity = a;
 		accessTime = t;
 		writeHitPolicy = whp;
-		writeMissPolicy = wmp;
 		content = new String [size/bytesBlock][bytesBlock];
 		tag = new String [size/bytesBlock];
 		valid = new int [size/bytesBlock];
