@@ -1,3 +1,6 @@
+import java.util.ArrayList;
+import java.util.Date;
+
 
 public class ICache {
 	private int size, bytesBlock, associativity, accessTime;
@@ -6,6 +9,9 @@ public class ICache {
 	private int [] valid;
 	private int index, offset;
 	private int misses = 0,hits = 0;
+	private ArrayList<java.util.Date> lastUsed= new ArrayList<java.util.Date> ();
+	// 1 = LRU, 2 = Random
+    private int replacementPolicy;
 	
 
 	ICache(){
@@ -48,6 +54,68 @@ public class ICache {
 		}
 		return null;
 		
+		
+	}
+	public void put(int address, String data){
+		String addr = Main.integerToBinary(address);
+		String addrIndex = addr.substring(addr.length() - index - offset, addr.length()- offset);
+		String addrOffset = addr.substring(addr.length() - offset, addr.length());
+		String addrTag = addr.substring(0, addr.length() - index - offset);
+		
+		int intAddr = Main.binaryToInteger(addrIndex);
+		int intOffset = Main.binaryToInteger(addrOffset);
+		int startIndex = intAddr*associativity;
+		
+		boolean added = false;
+		for(int i = 0; i< associativity; i++){
+			if(valid[startIndex] == 1){
+				if(tag[startIndex].equals(addrTag)){
+					content[startIndex][intOffset] =data;
+					added = true;
+					lastUsed.set(startIndex, new java.util.Date());
+				}
+			}
+			startIndex ++;
+		}
+		
+		if(!added){
+			startIndex = intAddr*associativity;
+			for(int i = 0; i< associativity; i++){
+				if(valid[startIndex] == 0){
+					tag[startIndex] = addrTag;
+					content [startIndex][intOffset] = data;
+					added = true;
+					lastUsed.set(startIndex, new java.util.Date());
+				}
+				startIndex ++;
+			}
+		}
+		
+		
+		startIndex = intAddr*associativity;
+		if(!added){
+			if(replacementPolicy == 1){
+				Date lastDate = lastUsed.get(startIndex);
+				int replaceInd = startIndex;
+				for(int i = 0; i< associativity; i++){
+					if(lastUsed.get(startIndex).compareTo(lastDate)<0){
+						lastDate = lastUsed.get(startIndex);
+						replaceInd = startIndex;
+					}
+					startIndex ++;
+				}
+				tag[replaceInd] = addrTag;
+				content [replaceInd][intOffset] = data;
+				added = true;
+				lastUsed.set(replaceInd, new java.util.Date());
+			}
+			else {
+				tag[startIndex] = addrTag;
+				content [startIndex][intOffset] = data;
+				added = true;
+				lastUsed.set(startIndex, new java.util.Date());
+			}
+		}
 		
 	}
 
