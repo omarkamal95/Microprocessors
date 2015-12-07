@@ -159,7 +159,16 @@ public class Main {
 	}
 	
 	public void issue(Instruction ins){
+		/*if (RegisterStat[rs].Busy)in-flight instr. writes rs
+		 {h ← RegisterStat[rs].Reorder;
+		 if (ROB[h].Ready) Instr completed already 
+		 {RS[r].Vj ← ROB[h].Value; RS[r].Qj ← 0;}
+		 else {RS[r].Qj ← h;}  wait for instruction 
+		} else {RS[r].Vj ← Regs[rs]; RS[r].Qj ← 0;};
+		RS[r].Busy ← yes; RS[r].Dest ← b;
+		ROB[b].Instruction ← opcode; ROB[b].Dest ← rd;ROB[b].Ready ← no;*/
 		
+		if
 	}
 	
 	public void execute(Instruction ins){
