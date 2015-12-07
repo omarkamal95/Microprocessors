@@ -103,8 +103,8 @@ public class GUIapp {
 			public void actionPerformed(ActionEvent e) {
 				levelOfCaches = Integer.parseInt(textField.getText());
 				accessTime = Integer.parseInt(textField_1.getText());
-				MainMemory m = new MainMemory(accessTime);
-				CachesSetup c = new CachesSetup(levelOfCaches);
+//				MainMemory m = new MainMemory(accessTime);
+				CachesSetup c = new CachesSetup(accessTime, levelOfCaches);
 				c.NewScreen();
 				frame.setVisible(false);
 				System.out.println(levelOfCaches);

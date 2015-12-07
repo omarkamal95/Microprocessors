@@ -28,7 +28,7 @@ public class ICache {
 		valid = new int [0];
 	}
 
-	ICache(int s, int b, int a, int t){
+	public ICache(int s, int b, int a, int t){
 		size = s;
 		bytesBlock = b;
 		associativity = a;

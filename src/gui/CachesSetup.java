@@ -6,6 +6,8 @@ import javax.swing.JFrame;
 import javax.swing.SpringLayout;
 
 import Main.DCache;
+import Main.ICache;
+import Main.MainMemory;
 
 import javax.swing.JLabel;
 import javax.swing.JTextField;
@@ -22,8 +24,8 @@ public class CachesSetup {
 	private JFrame frame;
 	private static int levels;
 	private static int currentLevel = 1;
-	public ArrayList <DCache> DCaches;
-	public DCache [] Caches;
+	public ArrayList<DCache> DCaches;
+	public ArrayList<ICache> ICaches;
 	private JTextField textFieldS;
 	private JTextField textFieldL;
 	private JTextField textFieldm;
@@ -34,8 +36,10 @@ public class CachesSetup {
 	private int m;
 	private int whp;
 	private int accessTime;
+	private static int mmaccessTime;
 	private int replacementPolicy;
 	private int bufferSize;
+	private static MainMemory memory;
 	private JTextField BufferSizet;
 	
 
@@ -43,9 +47,11 @@ public class CachesSetup {
 	 * Create the application.
 	 * @param levelOfCaches 
 	 */
-	public CachesSetup(int l) {
+	public CachesSetup(int a, int l) {
 		levels = l;
 		DCaches = new ArrayList();
+		ICaches = new ArrayList();
+		mmaccessTime = a;
 		initialize();
 	}
 
@@ -57,7 +63,7 @@ public class CachesSetup {
 			EventQueue.invokeLater(new Runnable() {
 				public void run() {
 					try {
-						CachesSetup window = new CachesSetup(levels);
+						CachesSetup window = new CachesSetup(mmaccessTime, levels);
 						window.frame.setVisible(true);
 					} catch (Exception e) {
 						e.printStackTrace();
@@ -267,7 +273,9 @@ public class CachesSetup {
 				bufferSize = Integer.parseInt(BufferSizet.getText());
 				
 				DCache d = new DCache(S, L, m, accessTime, whp, replacementPolicy, bufferSize);
+				ICache i = new ICache(S, L, m, accessTime);
 				DCaches.add(d);
+				ICaches.add(i);
 				if(levels != 1)
 				{
 					NewScreen();
@@ -277,7 +285,7 @@ public class CachesSetup {
 				}
 				else
 				{
-					HardwareSetup h = new HardwareSetup();
+					HardwareSetup h = new HardwareSetup(mmaccessTime, DCaches, ICaches);
 					h.NewScreen();
 					frame.setVisible(false);
 				}

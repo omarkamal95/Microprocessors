@@ -9,13 +9,24 @@ public class Main {
 	MainMemory memory;
 	static int R1,R2,R3,R4,R5,R6,R7;
 	final int R0 = 0;
-	DCache dcaches [];
-	ICache icaches [];
+	ArrayList<DCache> dcaches;
+	ArrayList<ICache> icaches;
 	ArrayList<Instruction>  instructionBuffer = new ArrayList<Instruction>();
 	int instructionBufferCounter;
 	int instructionBufferSize;
 	int pc;
 	
+	// Number of instructions that can be issued to the reservation station simultaneously 
+	int pipelineWidth;
+	
+	//Number of Reservation Stations
+	int RScount;
+	
+	//Number of cycles needed by each functional unit
+	int FUcycles;
+	
+	String [] assembly;
+	ArrayList<String> dataValue;
 	int arithmeticExec;
 	int uncondBranchExec;
 	int condBranchExec;
@@ -31,21 +42,34 @@ public class Main {
 	ROBentry [] ROB = new ROBentry [ROBentries];
 	int ROBcounter;
 	
+	public Main(ArrayList<DCache>  d, ArrayList<ICache>  i, MainMemory m, int p, int ibs, int rsc, int rob, int fuc, String [] a, ArrayList<String> data)
+	{
+		dcaches = d;
+		icaches = i;
+		memory = m;
+		pipelineWidth = p;
+		instructionBufferSize = ibs;
+		RScount = rsc;
+		ROBcounter = rob;
+		FUcycles = fuc;
+		assembly = a;
+		dataValue = data;
+	}
 	
 	public int load(int address, String regNo){
 		int totalTime =0;
 		boolean found = false;
 		int cacheMisses = 0;
-		for(int i =0; i < dcaches.length;i++){
-			String data = dcaches[i].find(address);
+		for(int i =0; i < dcaches.size();i++){
+			String data = dcaches.get(i).find(address);
 			if(data != null){
 				found = true;
-				totalTime += dcaches[i].getAccessTime();
+				totalTime += dcaches.get(i).getAccessTime();
 				putInReg(data,regNo);
 				break;
 			}
 			else {
-				totalTime += dcaches[i].getAccessTime();
+				totalTime += dcaches.get(i).getAccessTime();
 				cacheMisses++;
 			}
 		}
@@ -58,14 +82,14 @@ public class Main {
 		}
 		
 		if(foundInMem){
-			cacheMisses = dcaches.length;
+			cacheMisses = dcaches.size();
 		}
-		String [] blockData = memory.getBlock(address,dcaches[0].getBytesBlock());
-		int offset = (int) Math.ceil(Math.log10(dcaches[0].getBytesBlock())/Math.log10(2));
+		String [] blockData = memory.getBlock(address,dcaches.get(0).getBytesBlock());
+		int offset = (int) Math.ceil(Math.log10(dcaches.get(0).getBytesBlock())/Math.log10(2));
 		for(int i = 0; i<cacheMisses; i++){
 			int begAdd = address - offset;
 			for (int j = 0; j<blockData.length;j++){
-				dcaches[i].put(begAdd,blockData[j]);
+				dcaches.get(i).put(begAdd,blockData[j]);
 				begAdd++;
 			}
 		}
@@ -80,16 +104,16 @@ public class Main {
 		int totalTime =0;
 		boolean found = false;
 		int cacheMisses = 0;
-		for(int i =0; i < icaches.length;i++){
-			String data = icaches[i].find(pc);
+		for(int i =0; i < icaches.size();i++){
+			String data = icaches.get(i).find(pc);
 			if(data != null){
 				found = true;
-				totalTime += icaches[i].getAccessTime();
+				totalTime += icaches.get(i).getAccessTime();
 				putInBuffer(data);
 				break;
 			}
 			else {
-				totalTime += icaches[i].getAccessTime();
+				totalTime += icaches.get(i).getAccessTime();
 				cacheMisses++;
 			}
 		}
@@ -102,14 +126,14 @@ public class Main {
 		}
 		
 		if(foundInMem){
-			cacheMisses = icaches.length;
+			cacheMisses = icaches.size();
 		}
-		String [] blockData = memory.getBlock(pc,icaches[0].getBytesBlock());
-		int offset = (int) Math.ceil(Math.log10(icaches[0].getBytesBlock())/Math.log10(2));
+		String [] blockData = memory.getBlock(pc,icaches.get(0).getBytesBlock());
+		int offset = (int) Math.ceil(Math.log10(icaches.get(0).getBytesBlock())/Math.log10(2));
 		for(int i = 0; i<cacheMisses; i++){
 			int begAdd = pc - offset;
 			for (int j = 0; j<blockData.length;j++){
-				icaches[i].put(begAdd,blockData[j]);
+				icaches.get(i).put(begAdd,blockData[j]);
 				begAdd++;
 			}
 		}
