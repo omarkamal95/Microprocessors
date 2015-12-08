@@ -1,3 +1,4 @@
+package Main;
 
 public class MainMemory {
 private String [] memory = new String[64*(2^10)];
@@ -8,7 +9,7 @@ MainMemory(){
 	accessTime = 0;
 }
 
-MainMemory(int time){
+public MainMemory(int time){
 	accessTime = time;
 }
 

@@ -1,3 +1,5 @@
+package Main;
+
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Queue;
@@ -6,7 +8,7 @@ import java.util.Queue;
 public class Main {
 	MainMemory memory;
 	static int R1,R2,R3,R4,R5,R6,R7;
-	final int R0 = 0;
+	final static int R0 = 0;
 	DCache dcaches [];
 	ICache icaches [];
 	ArrayList<Instruction>  instructionBuffer = new ArrayList<Instruction>();
@@ -23,10 +25,10 @@ public class Main {
 	
 	int ROBentries;
 	int [] RegSt = new int [8]; // Register status ROB#
-	int ROBhead = 0,ROBtail = 0;
+	int ROBhead = 1,ROBtail = 1;
 	//String [][] RS = new String [9][totalResrvStn];
 	ArrayList<Unit> RS = new ArrayList<Unit>();
-	ROBentry [] ROB = new ROBentry [ROBentries];
+	ROBentry [] ROB = new ROBentry [ROBentries+1];//ROB starts from 1 not 0 to be consistent
 	int ROBcounter;
 	
 	
@@ -158,17 +160,74 @@ public class Main {
 		return res;
 	}
 	
+	public static int getRegisterNo(String rs){
+		if(rs.equalsIgnoreCase("R0")){
+			return 0;
+		}
+		if(rs.equalsIgnoreCase("R1")){
+			return 1;
+		}
+		if(rs.equalsIgnoreCase("R2")){
+			return 2;
+		}
+		if(rs.equalsIgnoreCase("R3")){
+			return 3;
+		}
+		if(rs.equalsIgnoreCase("R4")){
+			return 4;
+		}
+		if(rs.equalsIgnoreCase("R5")){
+			return 5;
+		}
+		if(rs.equalsIgnoreCase("R6")){
+			return 6;
+		}
+		if(rs.equalsIgnoreCase("R7")){
+			return 7;
+		}
+		return 100;
+	}
+	
 	public void issue(Instruction ins){
-		/*if (RegisterStat[rs].Busy)in-flight instr. writes rs
-		 {h ← RegisterStat[rs].Reorder;
-		 if (ROB[h].Ready) Instr completed already 
-		 {RS[r].Vj ← ROB[h].Value; RS[r].Qj ← 0;}
-		 else {RS[r].Qj ← h;}  wait for instruction 
-		} else {RS[r].Vj ← Regs[rs]; RS[r].Qj ← 0;};
-		RS[r].Busy ← yes; RS[r].Dest ← b;
-		ROB[b].Instruction ← opcode; ROB[b].Dest ← rd;ROB[b].Ready ← no;*/
 		
-		if
+		if(RegSt[getRegisterNo(ins.rs)] != 0){
+			int h = RegSt[getRegisterNo(ins.rs)];
+			if(ROB[h].ready){
+				RS.get(ins.resStationIndex).vj = ROB[h].value;
+				RS.get(ins.resStationIndex).qj = 0;
+			}
+			else {
+				RS.get(ins.resStationIndex).qj = h;
+			}
+		}
+		else {
+			RS.get(ins.resStationIndex).vj = ins.rs;
+			RS.get(ins.resStationIndex).qj = 0;
+		}
+		RS.get(ins.resStationIndex).busy = true;
+		RS.get(ins.resStationIndex).dest =ROBtail;
+		ROB[ROBtail].instruction = ins.type;
+		ROB[ROBtail].dest = ins.rd;
+		ROB[ROBtail].ready = false;
+
+		if(ins.type >= 7 && ins.type <=11){
+			if(RegSt[getRegisterNo(ins.rt)] != 0){
+				int h = RegSt[getRegisterNo(ins.rt)];
+				if(ROB[h].ready){
+					RS.get(ins.resStationIndex).vk = ROB[h].value;
+					RS.get(ins.resStationIndex).qk = 0;
+				}
+				else {
+					RS.get(ins.resStationIndex).qk = h;
+				}
+			}
+			else {
+				RS.get(ins.resStationIndex).vk = ins.rs;
+				RS.get(ins.resStationIndex).qk = 0;
+			}
+			RegSt[getRegisterNo(ins.rd)] = ROBtail;
+		}
+		
 	}
 	
 	public void execute(Instruction ins){
@@ -185,6 +244,7 @@ public class Main {
 								if(s.unitType == 1 && !s.busy){
 									issue(ins);
 									ins.state++;
+									ins.resStationIndex = RS.indexOf(s);
 								}
 							}
 						}

@@ -1,4 +1,4 @@
-
+package Main;
 public class Instruction {
 	
 	/* 1= LW(rd,rs,rt) ,2= SW(rd,rs,rt) ,3= JMP(rd,rs,rt) ,4= BEQ(rd,rs,rt) ,5= JALR(rd,rs)
@@ -13,39 +13,44 @@ public class Instruction {
 	String rs,rt,rd;
 	int executionCycles;
 	int writeBackCycles;
+	int resStationIndex;
 	
 	public Instruction(int type, int state, String rs, String rt, String rd){
 		//to be done
 	}
 	
 	public int getAddress(){
+		if(rs.equalsIgnoreCase("R0")){
+			int res = Main.R0 + Integer.parseInt(rt);
+			return res;
+		}
 		if(rs.equalsIgnoreCase("R1")){
-			Main.R1 = Main.R1 + Integer.parseInt(rt);
-			return Main.R1;
+			int res = Main.R1 + Integer.parseInt(rt);
+			return res;
 		}
 		if(rs.equalsIgnoreCase("R2")){
-			Main.R2 = Main.R2 + Integer.parseInt(rt);
-			return Main.R2;
+			int res = Main.R2 + Integer.parseInt(rt);
+			return res;
 		}
 		if(rs.equalsIgnoreCase("R3")){
-			Main.R3 = Main.R3 + Integer.parseInt(rt);
-			return Main.R3;
+			int res = Main.R3 + Integer.parseInt(rt);
+			return res;
 		}
 		if(rs.equalsIgnoreCase("R4")){
-			Main.R4 = Main.R4 + Integer.parseInt(rt);
-			return Main.R4;
+			int res = Main.R4 + Integer.parseInt(rt);
+			return res;
 		}
 		if(rs.equalsIgnoreCase("R5")){
-			Main.R5 = Main.R5 + Integer.parseInt(rt);
-			return Main.R5;
+			int res = Main.R5 + Integer.parseInt(rt);
+			return res;
 		}
 		if(rs.equalsIgnoreCase("R6")){
-			Main.R6 = Main.R6 + Integer.parseInt(rt);
-			return Main.R6;
+			int res = Main.R6 + Integer.parseInt(rt);
+			return res;
 		}
 		if(rs.equalsIgnoreCase("R7")){
-			Main.R7 = Main.R7 + Integer.parseInt(rt);
-			return Main.R7;
+			int res = Main.R7 + Integer.parseInt(rt);
+			return res;
 		}
 		
 		return 0;

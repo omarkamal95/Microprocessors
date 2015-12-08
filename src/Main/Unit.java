@@ -1,9 +1,10 @@
-
+package Main;
 public class Unit {
 		
 	// 1= Load/Store, 2= unconditional branch, 3= conditional branch, 4= call/return
 	// 5= Arithmetic
 	int unitType;
+	
 	
 	boolean busy;
 	int op;
