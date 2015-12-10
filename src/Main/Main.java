@@ -206,6 +206,7 @@ public class Main {
 			insStrings[i].trim();
 		int type = 0;
 		String rs = null,rt = null,rd = null;
+		int branchPC = 0;
 		if(insStrings[0].equalsIgnoreCase("lw")){
 			type = 1;
 			rd = insStrings[1];
@@ -230,6 +231,7 @@ public class Main {
 			rt = insStrings[2];
 			rd = insStrings[3];
 			if(Integer.parseInt(rd)<0){
+				branchPC = pc +2;
 				pc = pc +  Integer.parseInt(rd);
 			}
 
@@ -279,6 +281,9 @@ public class Main {
 		Instruction ins= new Instruction(type, rs, rt, rd);
 		if(ins.type == 5){
 			ins.pcPos = pc+2;
+		}
+		else if (ins.type == 4){
+			ins.pcPos = branchPC;
 		}
 		instructionBuffer.add(ins);
 		

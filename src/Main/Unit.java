@@ -16,6 +16,17 @@ public class Unit {
 	public Unit(){
 		
 	}
+public Unit(int type){
+		this.unitType= type;
+		 busy = false;
+		 op = 0;
+		 vj =null;
+		 vk= null;
+		 qj =0;
+		 qk = 0;
+		 dest = 0;
+		 a = "";
+	}
 
 
 	public boolean isBusy() {
