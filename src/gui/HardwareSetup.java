@@ -4,8 +4,15 @@ import java.awt.EventQueue;
 
 import javax.swing.JFrame;
 import javax.swing.SpringLayout;
+
+import Main.*;
+
 import javax.swing.JLabel;
 import java.awt.Font;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.ArrayList;
+
 import javax.swing.JTextField;
 import javax.swing.JButton;
 
@@ -17,7 +24,26 @@ public class HardwareSetup {
 	private JTextField textField_2;
 	private JTextField textField_3;
 	private JTextField textField_4;
-
+	
+	private int pipelineWidth;
+	private int InstructionBufferSize;
+	private int RScount;
+	private int ROBcount;
+	private int FUcycles;
+	private static MainMemory memory;
+	public static ArrayList<DCache> DCaches;
+	public static ArrayList<ICache> ICaches;
+	private static int mmaccessTime;
+	
+	/**
+	 * Create the application.
+	 */
+	public HardwareSetup(int m, ArrayList<DCache> d, ArrayList<ICache> i) {
+		DCaches = d;
+		ICaches = i;
+		mmaccessTime = m;
+		initialize();
+	}
 	/**
 	 * Launch the application.
 	 */
@@ -25,7 +51,7 @@ public class HardwareSetup {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
-					HardwareSetup window = new HardwareSetup();
+					HardwareSetup window = new HardwareSetup(mmaccessTime, DCaches, ICaches);
 					window.frame.setVisible(true);
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -34,12 +60,7 @@ public class HardwareSetup {
 		});
 	}
 
-	/**
-	 * Create the application.
-	 */
-	public HardwareSetup() {
-		initialize();
-	}
+	
 
 	/**
 	 * Initialize the contents of the frame.
@@ -127,6 +148,21 @@ public class HardwareSetup {
 		textField_4.setColumns(10);
 		
 		JButton btnNext = new JButton("Next");
+		btnNext.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				pipelineWidth = Integer.parseInt(textField.getText());
+				InstructionBufferSize = Integer.parseInt(textField_1.getText());
+				RScount = Integer.parseInt(textField_2.getText());
+				ROBcount = Integer.parseInt(textField_3.getText());
+				FUcycles = Integer.parseInt(textField_4.getText());
+				
+				Assembly a = new Assembly(DCaches, ICaches, mmaccessTime, pipelineWidth, InstructionBufferSize, RScount, ROBcount, FUcycles);
+				a.newScreen();
+				frame.setVisible(false);
+
+			}
+		});
+			
 		springLayout.putConstraint(SpringLayout.NORTH, btnNext, 6, SpringLayout.SOUTH, textField_4);
 		springLayout.putConstraint(SpringLayout.EAST, btnNext, -10, SpringLayout.EAST, frame.getContentPane());
 		frame.getContentPane().add(btnNext);

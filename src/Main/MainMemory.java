@@ -33,6 +33,11 @@ public String [] getBlock(int address, int bytesBlock){
 	return block;
 }
 
+public void insertInstruction(int address, String inst)
+{
+	memory[address] = inst;
+}
+
 public int getAccessTime() {
 	return accessTime;
 }
