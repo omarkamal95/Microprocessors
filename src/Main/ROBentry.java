@@ -12,6 +12,9 @@ public class ROBentry {
 	int instruction;
 	
 	public ROBentry(){
-		
+		dest = null;
+		value = null;
+		ready = false;
+		instruction = 0;
 	}
 }

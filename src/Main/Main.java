@@ -15,27 +15,27 @@ public class Main {
 	int instructionBufferCounter;
 	int instructionBufferSize;
 	int pc;
-	
+
 	ArrayList<Instruction> instructionsToBeWritten = new ArrayList<Instruction>();
-	
+
 	// Number of instructions that can be issued to the reservation station simultaneously 
 	int pipelineWidth;
-	
+
 	//Number of Reservation Stations
 	int RScount;
-	
+
 	//Number of cycles needed by each functional unit
 	int FUcycles;
-	
+
 	String [] assembly;
 	ArrayList<String> dataValue;
 	int arithmeticExec;
 	int uncondBranchExec;
 	int condBranchExec;
 	int callExec;
-	
-	
-	
+
+
+
 	int ROBentries;
 	int [] RegSt = new int [8]; // Register status ROB#
 	int ROBhead = 1,ROBtail = 1;
@@ -43,7 +43,7 @@ public class Main {
 	ArrayList<Unit> RS = new ArrayList<Unit>();
 	ROBentry [] ROB = new ROBentry [ROBentries+1];//ROB starts from 1 not 0 to be consistent
 	int ROBcounter;
-	
+
 	public Main(ArrayList<DCache>  d, ArrayList<ICache>  i, MainMemory m, int p, int ibs, int rsc, int rob, int fuc, String [] a, ArrayList<String> data)
 	{
 		dcaches = d;
@@ -57,7 +57,7 @@ public class Main {
 		assembly = a;
 		dataValue = data;
 	}
-	
+
 	public int load(int address, String regNo){
 		int totalTime =0;
 		boolean found = false;
@@ -82,7 +82,7 @@ public class Main {
 			totalTime += memory.getAccessTime();
 			foundInMem = true;
 		}
-		
+
 		if(foundInMem){
 			cacheMisses = dcaches.size();
 		}
@@ -98,7 +98,7 @@ public class Main {
 		return totalTime;
 
 	}
-	
+
 	public String getLoadData(int address){
 		int totalTime =0;
 		boolean found = false;
@@ -121,13 +121,13 @@ public class Main {
 			res = memory.find(address);
 			totalTime += memory.getAccessTime();
 		}
-		
-		
+
+
 		return res;
 
 	}
-	
-	
+
+
 	public int loadSim(int address, String regNo){
 		int totalTime =0;
 		boolean found = false;
@@ -147,18 +147,98 @@ public class Main {
 		if(!found){
 			totalTime += memory.getAccessTime();
 		}
-		
-		
+
+
 		return totalTime;
 
 	}
-	public int store(int address){
-		return 0;
+	public int store(int address, String data){
+		int totalTime =0;
+		boolean found = false;
+		int cacheMisses = 0;
+		boolean bufferFullWrite = false;
+		for(int i =0; i < dcaches.size();i++){
+			boolean foundInCache = dcaches.get(i).write(address,data);
+			if(foundInCache){
+				found = true;
+				totalTime += dcaches.get(i).getAccessTime();
+				if(dcaches.get(i).getWriteHitPolicy() == 2){
+					if(dcaches.get(i).bufferFull){
+						bufferFullWrite = true;
+						for(int j= 0; j< dcaches.get(i).getBufferSize(); j++){
+							for (int k = i+1;k <dcaches.size();k++){
+								dcaches.get(k).writeIfFound(dcaches.get(i).getAddressBuffer()[j], 
+										dcaches.get(i).getDataBuffer()[j]);
+							}
+							memory.getMemory()[dcaches.get(i).getAddressBuffer()[j]]= dcaches.get(i).getDataBuffer()[j];
+						}
+						dcaches.get(i).emptyBuffer();
+					}
+				}
+				break;
+			}
+			else {
+				totalTime += dcaches.get(i).getAccessTime();
+				cacheMisses++;
+			}
+		}
+		if(!found){
+			memory.getMemory()[address] = data;
+			totalTime += memory.getAccessTime();
+		}
+		if(bufferFullWrite){
+			totalTime += memory.getAccessTime();
+			int i = cacheMisses+2;
+			while(i< dcaches.size()){
+				totalTime += dcaches.get(i).getAccessTime();
+				i++;
+			}
+		}
+
+
+		return totalTime;
+
 	}
-	public int storeSim(int address){
-		return 0;
+	public int storeSim(int address,String data){
+		int totalTime =0;
+		boolean found = false;
+		int cacheMisses = 0;
+		boolean bufferFullWrite = false;
+		for(int i =0; i < dcaches.size();i++){
+			boolean foundInCache = dcaches.get(i).writeSim(address,data);
+			if(foundInCache){
+				found = true;
+				totalTime += dcaches.get(i).getAccessTime();
+				if(dcaches.get(i).getWriteHitPolicy() == 2){
+					if(dcaches.get(i).bufferFull){
+						bufferFullWrite = true;
+						dcaches.get(i).bufferFull = false;
+					}
+				}
+				break;
+			}
+			else {
+				totalTime += dcaches.get(i).getAccessTime();
+				cacheMisses++;
+			}
+		}
+		if(!found){
+			totalTime += memory.getAccessTime();
+		}
+		if(bufferFullWrite){
+			totalTime += memory.getAccessTime();
+			int i = cacheMisses+2;
+			while(i< dcaches.size()){
+				totalTime += dcaches.get(i).getAccessTime();
+				i++;
+			}
+		}
+
+
+		return totalTime;
+
 	}
-	
+
 	public int fetch(){
 		int totalTime =0;
 		boolean found = false;
@@ -183,7 +263,7 @@ public class Main {
 			totalTime += memory.getAccessTime();
 			foundInMem = true;
 		}
-		
+
 		if(foundInMem){
 			cacheMisses = icaches.size();
 		}
@@ -199,7 +279,7 @@ public class Main {
 		pc+=2;
 		return totalTime;
 	}
-	
+
 	public void putInBuffer(String data){
 		String [] insStrings = data.split(",");
 		for(int i = 0; i< insStrings.length; i++)
@@ -286,10 +366,10 @@ public class Main {
 			ins.pcPos = branchPC;
 		}
 		instructionBuffer.add(ins);
-		
+
 	}
-	
-	
+
+
 	public void putInReg(String data, String regNo){
 		int intData = Integer.parseInt(data);
 		if(regNo.equalsIgnoreCase("R1")){
@@ -323,7 +403,7 @@ public class Main {
 				result += Math.pow(2, (numbers.length-i - 1));
 		return result;
 	}
-	
+
 	public static String integerToBinary(int x){
 		String res = Integer.toBinaryString(x);
 		while(res.length()<16){
@@ -331,7 +411,7 @@ public class Main {
 		}
 		return res;
 	}
-	
+
 	public static int getRegisterNo(String rs){
 		if(rs.equalsIgnoreCase("R0")){
 			return 0;
@@ -359,7 +439,7 @@ public class Main {
 		}
 		return 100;
 	}
-	
+
 	public static int getRegisterValue(String rs){
 		if(rs.equalsIgnoreCase("R0")){
 			return R0;
@@ -387,9 +467,9 @@ public class Main {
 		}
 		return 100;
 	}
-	
+
 	public void issue(Instruction ins){
-		
+
 		if(RegSt[getRegisterNo(ins.rs)] != 0){
 			int h = RegSt[getRegisterNo(ins.rs)];
 			if(ROB[h].ready){
@@ -423,11 +503,11 @@ public class Main {
 			RegSt[getRegisterNo(ins.rd)] = ROBtail;
 		}
 		if(ins.type != 2 && ins.type != 3 && ins.type != 4 && ins.type != 6){
-		RS.get(ins.resStationIndex).busy = true;
-		RS.get(ins.resStationIndex).dest =ROBtail;
-		ROB[ROBtail].instruction = ins.type;
-		ROB[ROBtail].dest = ins.rd;
-		ROB[ROBtail].ready = false;
+			RS.get(ins.resStationIndex).busy = true;
+			RS.get(ins.resStationIndex).dest =ROBtail;
+			ROB[ROBtail].instruction = ins.type;
+			ROB[ROBtail].dest = ins.rd;
+			ROB[ROBtail].ready = false;
 		}
 		else if( ins.type == 2){
 			RS.get(ins.resStationIndex).busy = true;
@@ -443,9 +523,10 @@ public class Main {
 			ROB[ROBtail].dest = "branch";
 			ROB[ROBtail].ready = false;
 		}
-		
+		ROBcounter++;
+		incrementTail();
 	}
-	
+
 	public String NAND(int x, int y){
 		String xs = integerToBinary(x);
 		String ys = integerToBinary(y);
@@ -462,18 +543,39 @@ public class Main {
 		}
 		return ""+ binaryToInteger(res);
 	}
-	
+
 	public void writeBack(Instruction ins){
-//		b ← RS[r].Dest; RS[r].Busy ← no;
-//		∀x(if (RS[x].Qj==b) {RS[x].Vj ← result; RS[x].Qj ← 0});
-//		∀x(if (RS[x].Qk==b) {RS[x].Vk ← result; RS[x].Qk ← 0});
-//		ROB[b].Value ← result; ROB[b].Ready ← yes;
+		//		b ← RS[r].Dest; RS[r].Busy ← no;
+		//		∀x(if (RS[x].Qj==b) {RS[x].Vj ← result; RS[x].Qj ← 0});
+		//		∀x(if (RS[x].Qk==b) {RS[x].Vk ← result; RS[x].Qk ← 0});
+		//		ROB[b].Value ← result; ROB[b].Ready ← yes;
 		String res=null; // to be defined according to ins
 		if(ins.type == 1){
-			res = getLoadData(ins.getAddress());
+			res = ""+ins.getAddress();
+		}
+		else if(ins.type == 2){
+			res = ""+getRegisterValue(RS.get(ins.resStationIndex).vk);
 		}
 		else if(ins.type == 5){
 			res = "" +ins.pcPos;
+		}
+		else if(ins.type == 4){
+			if(Integer.parseInt(ins.rd) < 0){
+				if(!RS.get(ins.resStationIndex).vj.equalsIgnoreCase(RS.get(ins.resStationIndex).vk)){
+					res = "" +ins.pcPos;
+				}
+				else {
+					res = null;
+				}
+			} 
+			else if(Integer.parseInt(ins.rd) >= 0){
+				if(RS.get(ins.resStationIndex).vj.equalsIgnoreCase(RS.get(ins.resStationIndex).vk)){
+					res = ins.rd;
+				}
+				else {
+					res = null;
+				}
+			}
 		}
 		else if(ins.type == 7){
 			res =""+ (getRegisterValue(RS.get(ins.resStationIndex).vj) 
@@ -495,8 +597,8 @@ public class Main {
 			res =""+ (getRegisterValue(RS.get(ins.resStationIndex).vj)  
 					-getRegisterValue(RS.get(ins.resStationIndex).vk));
 		}
-		
-		
+
+
 		int b = RS.get(ins.resStationIndex).dest;
 		RS.get(ins.resStationIndex).busy = false;
 		for(Unit x: RS){
@@ -513,7 +615,115 @@ public class Main {
 		ROB[b].ready = true;
 	}
 	
+	public void incrementHead(){
+		if(ROBhead == ROBentries){
+			ROBhead = 1;
+		}
+		else {
+			ROBhead++;
+		}
+	}
+	public void incrementTail(){
+		if(ROBtail == ROBentries){
+			ROBtail = 1;
+		}
+		else {
+			ROBtail++;
+		}
+	}
+	
+	
+	public void commit(){
+		for(int i=0;i< pipelineWidth; i++){
+			if(ROBcounter>0){
+				ROBentry headEntry = ROB[ROBhead];
+				if(headEntry.ready){
+					if(headEntry.instruction == 1){
+						load(Integer.parseInt(headEntry.value), headEntry.dest);
+						if (RegSt[getRegisterNo(headEntry.dest)] == ROBhead) {
+							RegSt[getRegisterNo(headEntry.dest)] = 0;
+						}
+					}
+					else if(headEntry.instruction ==2 ){
+						store(Integer.parseInt(headEntry.dest), headEntry.value);
+					}
+					else if (headEntry.instruction == 4){
+						if(headEntry.value != null){
+							pc = Integer.parseInt(headEntry.value);
+							clearROB();
+							clearRegisterStat();
+							clearInstructionBuff();
+						}
+					}
+					else if (headEntry.instruction == 5){
+						setRegValue(headEntry.dest,headEntry.value);
+						if (RegSt[getRegisterNo(headEntry.dest)] == ROBhead) {
+							RegSt[getRegisterNo(headEntry.dest)] = 0;
+						}
+					}
+					else if (headEntry.instruction >= 7 && headEntry.instruction <=11){
+						setRegValue(headEntry.dest, headEntry.value);
+						if (RegSt[getRegisterNo(headEntry.dest)] == ROBhead) {
+							RegSt[getRegisterNo(headEntry.dest)] = 0;
+						}
+					}
+				}
+				ROB[ROBhead] = new ROBentry();
+				incrementHead();
+			}
+		}
+	}
+
+	public void clearInstructionBuff() {
+		instructionBufferCounter = 0;
+		instructionBuffer.clear();
+	}
+
+	public void clearRegisterStat() {
+		for(int i = 0; i< RegSt.length;i++){
+			RegSt[i]=0;
+		}
+	}
+
+	public void clearROB() {
+		for(int i = 1; i<ROBentries+1; i++){
+			ROB[i] = new ROBentry();
+		}
+		ROBhead = 1;
+		ROBtail = 1;
+		ROBcounter = 0;
+	}
+
+	public void setRegValue(String rs, String value) {
+		
+		if(rs.equalsIgnoreCase("R1")){
+			 R1 = Integer.parseInt(value);;
+		}
+		if(rs.equalsIgnoreCase("R2")){
+			 R2= Integer.parseInt(value);;
+		}
+		if(rs.equalsIgnoreCase("R3")){
+			 R3= Integer.parseInt(value);;
+		}
+		if(rs.equalsIgnoreCase("R4")){
+			 R4= Integer.parseInt(value);;
+		}
+		if(rs.equalsIgnoreCase("R5")){
+			 R5= Integer.parseInt(value);;
+		}
+		if(rs.equalsIgnoreCase("R6")){
+			 R6= Integer.parseInt(value);;
+		}
+		if(rs.equalsIgnoreCase("R7")){
+			 R7= Integer.parseInt(value);;
+		}
+
+	}
+
 	public void runCycle(){
+		
+		commit();
+		
 		if(instructionBufferCounter >0){
 			for(Instruction ins: instructionBuffer){
 				if(ins.state == 1){
@@ -572,9 +782,9 @@ public class Main {
 					}
 					else {
 						if(ins.type == 1){
-							 if( RS.get(ins.resStationIndex).qj == 0){
-								 ins.state++;
-							 }
+							if( RS.get(ins.resStationIndex).qj == 0){
+								ins.state++;
+							}
 						}
 						else {
 							if( RS.get(ins.resStationIndex).qj == 0 && RS.get(ins.resStationIndex).qk == 0){
@@ -611,9 +821,9 @@ public class Main {
 							ins.executionCycles--;
 							ins.state++;
 						}
-						
+
 					}
-					
+
 					else if(ins.type == 3){
 						if( RS.get(ins.resStationIndex).qj == 0){
 							ins.executionCycles = uncondBranchExec;
@@ -651,53 +861,52 @@ public class Main {
 					else {
 						ins.executionCycles--;
 					}
-					
+
 				}
 				else if (ins.state == 5){
-					 if(ins.type == 2){
-						 if(RS.get(ins.resStationIndex).qk == 0){
-							int time = storeSim(ins.getAddress());
+					if(ins.type == 2){
+						if(RS.get(ins.resStationIndex).qk == 0){
+							int time = storeSim(ins.getAddress(),""+getRegisterValue(RS.get(ins.resStationIndex).vk));
 							ins.writeBackCycles = time;
 							ins.writeBackCycles --;
 							ins.state++;
-							//writeBack(ins);
-							//impelement storeSim and writeback
-						 }
-						
+							instructionsToBeWritten.add(ins);
+						}
+
 					}
-					 else {
-						 ins.state +=2;
-						 if(ins.type!= 3 && ins.type!=4 && ins.type!=6)
-							 instructionsToBeWritten.add(ins);
-					 }
+					else {
+						ins.state +=2;
+						if(ins.type!= 3 && ins.type!=4 && ins.type!=6){	
+							instructionsToBeWritten.add(ins);
+						}
+
+						instructionBuffer.remove(ins);
+					}
 				}
 				else if (ins.state == 6){
 					if(ins.writeBackCycles == 0){
 						ins.state++;
+						instructionsToBeWritten.add(ins);
+						instructionBuffer.remove(ins);
 					}
 					else {
 						ins.writeBackCycles--;
 					}
 				}
-				else if( ins.state == 7){
-					commit(ins);
-					instructionBuffer.remove(ins);
-				}
+
 			}
+
+
 		}
-		if(instructionBufferCounter < instructionBufferSize){
-			fetch();
-		}
-		
 	}
-	
+
 	public void run(){
 		while(memory.getMemory()[pc]!= null && memory.getMemory()[pc]!= ""){
-				fetch();
-				runCycle();
-				for(Instruction ins: instructionsToBeWritten){
-					writeBack(ins);
-				}
+			fetch();
+			runCycle();
+			for(Instruction ins: instructionsToBeWritten){
+				writeBack(ins);
+			}
 		}
 		while(!instructionBuffer.isEmpty()){
 			runCycle();
@@ -706,14 +915,14 @@ public class Main {
 			}
 		}
 	}
-	
-	
-	
+
+
+
 	public static void main (String [] args){
-//		 java.util.Date date= new java.util.Date();
-//		 System.out.println(new Timestamp(date.getTime()));
-//		 java.util.Date date1= new java.util.Date();
-//		 System.out.println(new Timestamp(date1.getTime()));
+		//		 java.util.Date date= new java.util.Date();
+		//		 System.out.println(new Timestamp(date.getTime()));
+		//		 java.util.Date date1= new java.util.Date();
+		//		 System.out.println(new Timestamp(date1.getTime()));
 	}
 
 }

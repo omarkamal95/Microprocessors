@@ -19,9 +19,12 @@ public class DCache {
 	private String [] tag;
 	private int [] valid;
 	private int [][] dirty;
-	private int bufferSize, index, offset;
+	private int bufferSize, index, offset, bufferCount;
 	private int misses = 0,hits= 0;
 	private ArrayList<java.util.Date> lastUsed= new ArrayList<java.util.Date> ();
+	int[] addressBuffer;
+	String [] dataBuffer;
+	boolean bufferFull;
 	
 
 	DCache(){
@@ -51,6 +54,10 @@ public class DCache {
 		replacementPolicy = rp;
 		if(writeHitPolicy == 2){
 			bufferSize = bs;
+			addressBuffer = new int [bufferSize];
+			dataBuffer = new String [bufferSize];
+			bufferCount =0;
+			bufferFull = false;
 		}
 		if (writeHitPolicy == 1){
 			dirty = new int [size/bytesBlock][bytesBlock];
@@ -66,7 +73,7 @@ public class DCache {
 		String addrOffset = addr.substring(addr.length() - offset, addr.length());
 		String addrTag = addr.substring(0, addr.length() - index - offset);
 		 
-		//to done , what is the buffer size and implement write backs
+		//to done writeback not yet impelemented
 		
 		int intAddr = Main.binaryToInteger(addrIndex);
 		int intOffset = Main.binaryToInteger(addrOffset);
@@ -76,7 +83,17 @@ public class DCache {
 				if(tag[startIndex].equals(addrTag)){
 					lastUsed.set(startIndex, new java.util.Date());
 					content[startIndex][intOffset] = data;
-					dirty [startIndex][intOffset] = 1;
+					if(writeHitPolicy == 1){
+						dirty [startIndex][intOffset] = 1;
+					}
+					else if(writeHitPolicy == 2){
+						addressBuffer[bufferCount] = address;
+						dataBuffer[bufferCount] = data;
+						bufferCount++;
+						if(bufferCount == bufferSize){
+							bufferFull = true;
+						}
+					}
 					return true;
 				}
 			}
@@ -86,6 +103,69 @@ public class DCache {
 
 	}
 	
+	public boolean writeIfFound(int address, String data) {
+		String addr = Main.integerToBinary(address);
+		String addrIndex = addr.substring(addr.length() - index - offset, addr.length()- offset);
+		String addrOffset = addr.substring(addr.length() - offset, addr.length());
+		String addrTag = addr.substring(0, addr.length() - index - offset);
+		 
+		
+		int intAddr = Main.binaryToInteger(addrIndex);
+		int intOffset = Main.binaryToInteger(addrOffset);
+		int startIndex = intAddr*associativity;
+		for(int i = 0; i< associativity; i++){
+			if(valid[startIndex] == 1){
+				if(tag[startIndex].equals(addrTag)){
+					lastUsed.set(startIndex, new java.util.Date());
+					content[startIndex][intOffset] = data;
+					return true;
+				}
+			}
+			startIndex ++;
+		}
+		return false;
+
+	}
+	
+	public boolean writeSim(int address, String data) {
+		String addr = Main.integerToBinary(address);
+		String addrIndex = addr.substring(addr.length() - index - offset, addr.length()- offset);
+		String addrOffset = addr.substring(addr.length() - offset, addr.length());
+		String addrTag = addr.substring(0, addr.length() - index - offset);
+		 
+		
+		int intAddr = Main.binaryToInteger(addrIndex);
+		int intOffset = Main.binaryToInteger(addrOffset);
+		int startIndex = intAddr*associativity;
+		for(int i = 0; i< associativity; i++){
+			if(valid[startIndex] == 1){
+				if(tag[startIndex].equals(addrTag)){
+					if(writeHitPolicy == 1){
+						//dirty [startIndex][intOffset] = 1;
+					}
+					else if(writeHitPolicy == 2){
+						if(bufferCount+1 == bufferSize){
+							bufferFull = true;
+						}
+					}
+					return true;
+				}
+			}
+			startIndex ++;
+		}
+		return false;
+
+	}
+	
+	
+	public void emptyBuffer(){
+		for(int i = 0; i< bufferSize; i++){
+			dataBuffer[i] = null;
+			addressBuffer[i] = 0;
+		}
+		bufferCount = 0;
+		bufferFull = false;
+	}
 	public void put(int address, String data){
 		String addr = Main.integerToBinary(address);
 		String addrIndex = addr.substring(addr.length() - index - offset, addr.length()- offset);
@@ -280,13 +360,65 @@ public class DCache {
 		this.bufferSize = bufferSize;
 	}
 
-	public int[] getDirty() {
+	public int[][] getDirty() {
 		return dirty;
 	}
 
-	public void setDirty(int[] dirty) {
+	public void setDirty(int[][] dirty) {
 		this.dirty = dirty;
 	}
+
+	public int getIndex() {
+		return index;
+	}
+
+	public void setIndex(int index) {
+		this.index = index;
+	}
+
+	public int getOffset() {
+		return offset;
+	}
+
+	public void setOffset(int offset) {
+		this.offset = offset;
+	}
+
+	public ArrayList<java.util.Date> getLastUsed() {
+		return lastUsed;
+	}
+
+	public void setLastUsed(ArrayList<java.util.Date> lastUsed) {
+		this.lastUsed = lastUsed;
+	}
+
+	public int getBufferCount() {
+		return bufferCount;
+	}
+
+	public void setBufferCount(int bufferCount) {
+		this.bufferCount = bufferCount;
+	}
+
+	public int[] getAddressBuffer() {
+		return addressBuffer;
+	}
+
+	public void setAddressBuffer(int[] addressBuffer) {
+		this.addressBuffer = addressBuffer;
+	}
+
+	public String[] getDataBuffer() {
+		return dataBuffer;
+	}
+
+	public void setDataBuffer(String[] dataBuffer) {
+		this.dataBuffer = dataBuffer;
+	}
+
+	
+	
+	
 		
 	
 	
