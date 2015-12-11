@@ -25,15 +25,15 @@ public class Assembly {
 	private String text;
 	private static int pipelineWidth;
 	private static int InstructionBufferSize;
-	private static int RScount;
 	private static int ROBcount;
-	private static int FUcycles;
 	private static int mmcycleTime;
+	private static int loadCount,uncondCount,condCount,callCount,arithmeticCount;
+	private static int uncondCycle,coCycle,clCycle,arithmeticCycle,origin;
 	private static MainMemory memory;
 	public static ArrayList<DCache> DCaches;
 	public static ArrayList<ICache> ICaches;
 	private static String [] assembly;
-	private JTextField textField;
+	private JTextField originField;
 
 	/**
 	 * Launch the application.
@@ -42,7 +42,7 @@ public class Assembly {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
-					Assembly window = new Assembly(DCaches, ICaches, mmcycleTime, pipelineWidth, InstructionBufferSize, RScount, ROBcount, FUcycles);
+					Assembly window = new Assembly(DCaches, ICaches, mmcycleTime, pipelineWidth, InstructionBufferSize, ROBcount, loadCount, uncondCount, condCount,callCount, arithmeticCount,uncondCycle,coCycle,clCycle,arithmeticCycle);
 					window.frame.setVisible(true);
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -54,15 +54,24 @@ public class Assembly {
 	/**
 	 * Create the application.
 	 */
-	public Assembly(ArrayList<DCache> d, ArrayList<ICache> i, int m, int p, int ibs, int rsc, int rob, int fuc) {
+	public Assembly(ArrayList<DCache> d, ArrayList<ICache> i, int m, int p, int ibs, int rob,int ld, int un, int cn, int call, int arth, int uncondCycle,int coCycle ,int clCycle, int arithmeticCycle) {
 		DCaches = d;
 		ICaches = i;
 		mmcycleTime = m;
 		pipelineWidth = p;
 		InstructionBufferSize = ibs;
-		RScount = rsc;
 		ROBcount = rob;
-		FUcycles = fuc;
+		loadCount = ld;
+		uncondCount = un;
+		condCount = cn;
+		callCount = call;
+		arithmeticCount = arth;
+		this.uncondCycle = uncondCycle;
+		this.coCycle = coCycle;
+		this.clCycle = clCycle;
+		this.arithmeticCycle = arithmeticCycle;
+
+
 		initialize();
 	}
 
@@ -92,12 +101,12 @@ public class Assembly {
 		springLayout.putConstraint(SpringLayout.WEST, lblAssembly, 0, SpringLayout.WEST, lblOrg);
 		frame.getContentPane().add(lblAssembly);
 		
-		textField = new JTextField();
-		springLayout.putConstraint(SpringLayout.NORTH, textField, -6, SpringLayout.NORTH, lblOrg);
-		springLayout.putConstraint(SpringLayout.WEST, textField, 6, SpringLayout.EAST, lblOrg);
-		springLayout.putConstraint(SpringLayout.EAST, textField, -346, SpringLayout.EAST, frame.getContentPane());
-		frame.getContentPane().add(textField);
-		textField.setColumns(10);
+		originField = new JTextField();
+		springLayout.putConstraint(SpringLayout.NORTH, originField, -6, SpringLayout.NORTH, lblOrg);
+		springLayout.putConstraint(SpringLayout.WEST, originField, 6, SpringLayout.EAST, lblOrg);
+		springLayout.putConstraint(SpringLayout.EAST, originField, -346, SpringLayout.EAST, frame.getContentPane());
+		frame.getContentPane().add(originField);
+		originField.setColumns(10);
 		
 		final JTextArea textArea = new JTextArea();
 		springLayout.putConstraint(SpringLayout.NORTH, textArea, 6, SpringLayout.SOUTH, lblAssembly);
@@ -111,11 +120,13 @@ public class Assembly {
 			public void actionPerformed(ActionEvent e) {
 				text = textArea.getText();
 				assembly = text.split("//n");
+				origin = Integer.parseInt(originField.getText());
 				for(int i  = 0; i< assembly.length; i++)
 				{
 					System.out.println(assembly[i]);	
 				}
-				ProgramData p = new ProgramData(DCaches, ICaches, mmcycleTime, pipelineWidth, InstructionBufferSize, RScount, ROBcount, FUcycles, assembly);
+				ProgramData p = new ProgramData(DCaches, ICaches, mmcycleTime, pipelineWidth, InstructionBufferSize,ROBcount, 
+						loadCount, uncondCount, condCount,callCount, arithmeticCount,uncondCycle,coCycle,clCycle,arithmeticCycle,assembly,origin);
 				p.NewScreen();
 				frame.setVisible(false);
 			}

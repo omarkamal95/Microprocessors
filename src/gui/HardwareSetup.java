@@ -21,19 +21,26 @@ public class HardwareSetup {
 	private JFrame frame;
 	private JTextField textField;
 	private JTextField textField_1;
-	private JTextField textField_2;
 	private JTextField textField_3;
-	private JTextField textField_4;
 	
 	private int pipelineWidth;
 	private int InstructionBufferSize;
-	private int RScount;
+	private int loadCount,uncondCount,condCount,callCount,arithmeticCount;
+	private int uncondCycle,coCycle,clCycle,arithmeticCycle;
 	private int ROBcount;
-	private int FUcycles;
 	private static MainMemory memory;
 	public static ArrayList<DCache> DCaches;
 	public static ArrayList<ICache> ICaches;
 	private static int mmaccessTime;
+	private JTextField loadField;
+	private JTextField uncondField;
+	private JTextField condField;
+	private JTextField callbackField;
+	private JTextField arithmeticField;
+	private JTextField callCycle;
+	private JTextField unCycle;
+	private JTextField condCycle;
+	private JTextField arthCycle;
 	
 	/**
 	 * Create the application.
@@ -67,105 +74,147 @@ public class HardwareSetup {
 	 */
 	private void initialize() {
 		frame = new JFrame();
-		frame.setBounds(100, 100, 450, 300);
+		frame.setBounds(100, 100, 450, 600);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		SpringLayout springLayout = new SpringLayout();
-		frame.getContentPane().setLayout(springLayout);
+		frame.getContentPane().setLayout(null);
 		
 		JLabel lblSecondStep = new JLabel("Second step:");
+		lblSecondStep.setBounds(10, 10, 107, 18);
 		lblSecondStep.setFont(new Font("Lucida Grande", Font.BOLD, 15));
-		springLayout.putConstraint(SpringLayout.NORTH, lblSecondStep, 10, SpringLayout.NORTH, frame.getContentPane());
-		springLayout.putConstraint(SpringLayout.WEST, lblSecondStep, 10, SpringLayout.WEST, frame.getContentPane());
 		frame.getContentPane().add(lblSecondStep);
 		
 		JLabel lblHardwareOrganizationSetup = new JLabel("Hardware Organization Setup:");
+		lblHardwareOrganizationSetup.setBounds(10, 34, 239, 17);
 		lblHardwareOrganizationSetup.setFont(new Font("Lucida Grande", Font.BOLD, 14));
-		springLayout.putConstraint(SpringLayout.NORTH, lblHardwareOrganizationSetup, 6, SpringLayout.SOUTH, lblSecondStep);
-		springLayout.putConstraint(SpringLayout.WEST, lblHardwareOrganizationSetup, 0, SpringLayout.WEST, lblSecondStep);
 		frame.getContentPane().add(lblHardwareOrganizationSetup);
 		
 		JLabel lblPipelineWidth = new JLabel("Pipeline width:");
-		springLayout.putConstraint(SpringLayout.NORTH, lblPipelineWidth, 22, SpringLayout.SOUTH, lblHardwareOrganizationSetup);
-		springLayout.putConstraint(SpringLayout.WEST, lblPipelineWidth, 39, SpringLayout.WEST, frame.getContentPane());
+		lblPipelineWidth.setBounds(39, 73, 106, 15);
 		frame.getContentPane().add(lblPipelineWidth);
 		
 		JLabel lblSizeOfInstruction = new JLabel("Size of instruction buffer:");
-		springLayout.putConstraint(SpringLayout.NORTH, lblSizeOfInstruction, 18, SpringLayout.SOUTH, lblPipelineWidth);
-		springLayout.putConstraint(SpringLayout.WEST, lblSizeOfInstruction, 0, SpringLayout.WEST, lblPipelineWidth);
+		lblSizeOfInstruction.setBounds(39, 106, 181, 15);
 		frame.getContentPane().add(lblSizeOfInstruction);
 		
-		JLabel lblNumberOfReservation = new JLabel("Number of Reservation Stations:");
-		springLayout.putConstraint(SpringLayout.NORTH, lblNumberOfReservation, 18, SpringLayout.SOUTH, lblSizeOfInstruction);
-		springLayout.putConstraint(SpringLayout.WEST, lblNumberOfReservation, 0, SpringLayout.WEST, lblPipelineWidth);
-		frame.getContentPane().add(lblNumberOfReservation);
-		
 		JLabel lblNumberOfRob = new JLabel("Number of ROB entries:");
-		springLayout.putConstraint(SpringLayout.NORTH, lblNumberOfRob, 16, SpringLayout.SOUTH, lblNumberOfReservation);
-		springLayout.putConstraint(SpringLayout.WEST, lblNumberOfRob, 0, SpringLayout.WEST, lblPipelineWidth);
+		lblNumberOfRob.setBounds(39, 133, 166, 15);
 		frame.getContentPane().add(lblNumberOfRob);
 		
-		JLabel lblNumberOfCycles = new JLabel("Number of cycles needed by each funtional unit:");
-		springLayout.putConstraint(SpringLayout.NORTH, lblNumberOfCycles, 21, SpringLayout.SOUTH, lblNumberOfRob);
-		springLayout.putConstraint(SpringLayout.WEST, lblNumberOfCycles, 0, SpringLayout.WEST, lblPipelineWidth);
-		frame.getContentPane().add(lblNumberOfCycles);
-		
 		textField = new JTextField();
-		springLayout.putConstraint(SpringLayout.NORTH, textField, -2, SpringLayout.NORTH, lblPipelineWidth);
-		springLayout.putConstraint(SpringLayout.WEST, textField, 6, SpringLayout.EAST, lblPipelineWidth);
-		springLayout.putConstraint(SpringLayout.SOUTH, textField, 39, SpringLayout.SOUTH, lblHardwareOrganizationSetup);
-		springLayout.putConstraint(SpringLayout.EAST, textField, 0, SpringLayout.EAST, lblSizeOfInstruction);
+		textField.setBounds(163, 71, 69, 19);
 		frame.getContentPane().add(textField);
 		textField.setColumns(10);
 		
 		textField_1 = new JTextField();
-		springLayout.putConstraint(SpringLayout.NORTH, textField_1, -7, SpringLayout.NORTH, lblSizeOfInstruction);
-		springLayout.putConstraint(SpringLayout.WEST, textField_1, 6, SpringLayout.EAST, lblSizeOfInstruction);
-		springLayout.putConstraint(SpringLayout.EAST, textField_1, 69, SpringLayout.EAST, lblSizeOfInstruction);
+		textField_1.setBounds(226, 99, 63, 19);
 		frame.getContentPane().add(textField_1);
 		textField_1.setColumns(10);
 		
-		textField_2 = new JTextField();
-		springLayout.putConstraint(SpringLayout.NORTH, textField_2, -2, SpringLayout.NORTH, lblNumberOfReservation);
-		springLayout.putConstraint(SpringLayout.WEST, textField_2, 6, SpringLayout.EAST, lblNumberOfReservation);
-		springLayout.putConstraint(SpringLayout.SOUTH, textField_2, 17, SpringLayout.NORTH, lblNumberOfReservation);
-		springLayout.putConstraint(SpringLayout.EAST, textField_2, 69, SpringLayout.EAST, lblNumberOfReservation);
-		frame.getContentPane().add(textField_2);
-		textField_2.setColumns(10);
-		
 		textField_3 = new JTextField();
-		springLayout.putConstraint(SpringLayout.NORTH, textField_3, 6, SpringLayout.SOUTH, lblNumberOfReservation);
-		springLayout.putConstraint(SpringLayout.WEST, textField_3, 6, SpringLayout.EAST, lblNumberOfRob);
-		springLayout.putConstraint(SpringLayout.EAST, textField_3, 69, SpringLayout.EAST, lblNumberOfRob);
+		textField_3.setBounds(236, 131, 63, 19);
 		frame.getContentPane().add(textField_3);
 		textField_3.setColumns(10);
 		
-		textField_4 = new JTextField();
-		springLayout.putConstraint(SpringLayout.NORTH, textField_4, -6, SpringLayout.NORTH, lblNumberOfCycles);
-		springLayout.putConstraint(SpringLayout.WEST, textField_4, 6, SpringLayout.EAST, lblNumberOfCycles);
-		springLayout.putConstraint(SpringLayout.SOUTH, textField_4, -45, SpringLayout.SOUTH, frame.getContentPane());
-		springLayout.putConstraint(SpringLayout.EAST, textField_4, -42, SpringLayout.EAST, frame.getContentPane());
-		frame.getContentPane().add(textField_4);
-		textField_4.setColumns(10);
-		
 		JButton btnNext = new JButton("Next");
+		btnNext.setBounds(374, 561, 66, 25);
 		btnNext.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				pipelineWidth = Integer.parseInt(textField.getText());
 				InstructionBufferSize = Integer.parseInt(textField_1.getText());
-				RScount = Integer.parseInt(textField_2.getText());
+				loadCount = Integer.parseInt(loadField.getText());
+				condCount = Integer.parseInt(condField.getText());
+				uncondCount = Integer.parseInt(uncondField.getText());
+				callCount = Integer.parseInt(callbackField.getText());
+				arithmeticCount = Integer.parseInt(arithmeticField.getText());
 				ROBcount = Integer.parseInt(textField_3.getText());
-				FUcycles = Integer.parseInt(textField_4.getText());
+				uncondCycle = Integer.parseInt(unCycle.getText());
+				coCycle = Integer.parseInt(condCycle.getText());
+				clCycle = Integer.parseInt(callCycle.getText());
+				arithmeticCycle = Integer.parseInt(arthCycle.getText());;
 				
-				Assembly a = new Assembly(DCaches, ICaches, mmaccessTime, pipelineWidth, InstructionBufferSize, RScount, ROBcount, FUcycles);
+				Assembly a = new Assembly(DCaches, ICaches, mmaccessTime, pipelineWidth, InstructionBufferSize, ROBcount, loadCount, uncondCount, condCount,callCount, arithmeticCount,uncondCycle,coCycle,clCycle,arithmeticCycle);
 				a.newScreen();
 				frame.setVisible(false);
 
 			}
 		});
-			
-		springLayout.putConstraint(SpringLayout.NORTH, btnNext, 6, SpringLayout.SOUTH, textField_4);
-		springLayout.putConstraint(SpringLayout.EAST, btnNext, -10, SpringLayout.EAST, frame.getContentPane());
 		frame.getContentPane().add(btnNext);
+		
+		JLabel lblFunctionalUnits = new JLabel("Functional units:");
+		lblFunctionalUnits.setBounds(26, 206, 166, 15);
+		frame.getContentPane().add(lblFunctionalUnits);
+		
+		JLabel lblLoadstrore = new JLabel("Load/Strore");
+		lblLoadstrore.setBounds(26, 269, 107, 15);
+		frame.getContentPane().add(lblLoadstrore);
+		
+		JLabel lblUnc = new JLabel("Unconditional branch");
+		lblUnc.setBounds(26, 313, 151, 15);
+		frame.getContentPane().add(lblUnc);
+		
+		JLabel lblConditionalBranch = new JLabel("Conditional branch");
+		lblConditionalBranch.setBounds(26, 364, 151, 15);
+		frame.getContentPane().add(lblConditionalBranch);
+		
+		JLabel lblNewLabel = new JLabel("Callback/Return");
+		lblNewLabel.setBounds(26, 419, 119, 15);
+		frame.getContentPane().add(lblNewLabel);
+		
+		JLabel lblArithmetic = new JLabel("Arithmetic");
+		lblArithmetic.setBounds(37, 464, 140, 15);
+		frame.getContentPane().add(lblArithmetic);
+		
+		JLabel lblNoOfRes = new JLabel("No of Res Stations");
+		lblNoOfRes.setBounds(185, 206, 151, 15);
+		frame.getContentPane().add(lblNoOfRes);
+		
+		loadField = new JTextField();
+		loadField.setBounds(219, 267, 63, 19);
+		frame.getContentPane().add(loadField);
+		loadField.setColumns(10);
+		
+		uncondField = new JTextField();
+		uncondField.setBounds(219, 311, 63, 19);
+		frame.getContentPane().add(uncondField);
+		uncondField.setColumns(10);
+		
+		condField = new JTextField();
+		condField.setBounds(226, 362, 63, 19);
+		frame.getContentPane().add(condField);
+		condField.setColumns(10);
+		
+		callbackField = new JTextField();
+		callbackField.setBounds(226, 417, 63, 19);
+		frame.getContentPane().add(callbackField);
+		callbackField.setColumns(10);
+		
+		arithmeticField = new JTextField();
+		arithmeticField.setBounds(226, 462, 63, 19);
+		frame.getContentPane().add(arithmeticField);
+		arithmeticField.setColumns(10);
+		
+		JLabel lblCycleTime = new JLabel("cycle Time");
+		lblCycleTime.setBounds(348, 206, 92, 15);
+		frame.getContentPane().add(lblCycleTime);
+		
+		callCycle = new JTextField();
+		callCycle.setColumns(10);
+		callCycle.setBounds(348, 417, 69, 19);
+		frame.getContentPane().add(callCycle);
+		
+		unCycle = new JTextField();
+		unCycle.setColumns(10);
+		unCycle.setBounds(348, 323, 69, 19);
+		frame.getContentPane().add(unCycle);
+		
+		condCycle = new JTextField();
+		condCycle.setColumns(10);
+		condCycle.setBounds(348, 362, 69, 19);
+		frame.getContentPane().add(condCycle);
+		
+		arthCycle = new JTextField();
+		arthCycle.setColumns(10);
+		arthCycle.setBounds(348, 462, 69, 19);
+		frame.getContentPane().add(arthCycle);
 	}
-
 }

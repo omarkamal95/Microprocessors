@@ -1,31 +1,31 @@
 package Main;
 public class Unit {
-		
+
 	// 1= Load/Store, 2= unconditional branch, 3= conditional branch, 4= call/return
 	// 5= Arithmetic
 	int unitType;
-	
-	
+
+
 	boolean busy;
 	int op;
 	String vj,vk;
 	int qj,qk;
 	int dest;
 	String a;
-		
+
 	public Unit(){
-		
+
 	}
-public Unit(int type){
+	public Unit(int type){
 		this.unitType= type;
-		 busy = false;
-		 op = 0;
-		 vj =null;
-		 vk= null;
-		 qj =0;
-		 qk = 0;
-		 dest = 0;
-		 a = "";
+		busy = false;
+		op = 0;
+		vj =null;
+		vk= null;
+		qj =0;
+		qk = 0;
+		dest = 0;
+		a = "";
 	}
 
 
@@ -37,7 +37,7 @@ public Unit(int type){
 		this.busy = busy;
 	}
 
-	
+
 
 	public int getUnitType() {
 		return unitType;
@@ -102,6 +102,6 @@ public Unit(int type){
 	public void setA(String a) {
 		this.a = a;
 	}
-	
-	
+
+
 }

@@ -7,12 +7,12 @@ import java.util.Queue;
 
 public class Main {
 	MainMemory memory;
-	static int R1,R2,R3,R4,R5,R6,R7;
+	static int R1 =0,R2=0,R3=0,R4=0,R5=0,R6=0,R7=0;
 	final static int R0 = 0;
 	ArrayList<DCache> dcaches;
 	ArrayList<ICache> icaches;
 	ArrayList<Instruction>  instructionBuffer = new ArrayList<Instruction>();
-	int instructionBufferCounter;
+	int instructionBufferCounter = 0;
 	int instructionBufferSize;
 	int pc;
 
@@ -20,12 +20,6 @@ public class Main {
 
 	// Number of instructions that can be issued to the reservation station simultaneously 
 	int pipelineWidth;
-
-	//Number of Reservation Stations
-	int RScount;
-
-	//Number of cycles needed by each functional unit
-	int FUcycles;
 
 	String [] assembly;
 	ArrayList<String> dataValue;
@@ -42,20 +36,52 @@ public class Main {
 	//String [][] RS = new String [9][totalResrvStn];
 	ArrayList<Unit> RS = new ArrayList<Unit>();
 	ROBentry [] ROB = new ROBentry [ROBentries+1];//ROB starts from 1 not 0 to be consistent
-	int ROBcounter;
+	int ROBcounter = 0;
 
-	public Main(ArrayList<DCache>  d, ArrayList<ICache>  i, MainMemory m, int p, int ibs, int rsc, int rob, int fuc, String [] a, ArrayList<String> data)
+	public Main(ArrayList<DCache>  d, ArrayList<ICache>  i, MainMemory m, int p, int ibs, int rob,int ld, int un, int cn, int call, int arth,int uncondCycle,int coCycle,int clCycle,int arithmeticCycle, String [] a,int origin, ArrayList<String> data)
 	{
+		//how does she get the program and start address
+		pc = origin;
 		dcaches = d;
 		icaches = i;
 		memory = m;
 		pipelineWidth = p;
 		instructionBufferSize = ibs;
-		RScount = rsc;
-		ROBcounter = rob;
-		FUcycles = fuc;
+		ROBentries = rob;
 		assembly = a;
-		dataValue = data;
+		dataValue = data; // what is this?
+		ROB = new ROBentry [ROBentries+1];
+		instructionBuffer = new ArrayList<Instruction>();
+		arithmeticExec = arithmeticCycle;
+		uncondBranchExec = uncondCycle;
+		condBranchExec = coCycle;
+		callExec = clCycle;
+		RS = new ArrayList<Unit>();
+		for(int j = 0; j < ld; j++){
+			Unit x = new Unit(1);
+			RS.add(x);
+		}
+		for(int j = 0; j < un; j++){
+			Unit x = new Unit(2);
+			RS.add(x);
+		}
+		for(int j = 0; j < cn; j++){
+			Unit x = new Unit(3);
+			RS.add(x);
+		}
+		for(int j = 0; j < call; j++){
+			Unit x = new Unit(4);
+			RS.add(x);
+		}
+		for(int j = 0; j < arth; j++){
+			Unit x = new Unit(5);
+			RS.add(x);
+		}
+		int j = pc;
+		for(int k = 0; k< a.length;k++ ){
+			memory.getMemory()[j] = a[k];
+			j+=2;
+		}
 	}
 
 	public int load(int address, String regNo){
@@ -901,19 +927,16 @@ public class Main {
 	}
 
 	public void run(){
-		while(memory.getMemory()[pc]!= null && memory.getMemory()[pc]!= ""){
+		int i = 0;
+		while(memory.getMemory()[pc]!= null && memory.getMemory()[pc]!= "" && i<pipelineWidth ){
 			fetch();
+			i++;
+		}
 			runCycle();
 			for(Instruction ins: instructionsToBeWritten){
 				writeBack(ins);
 			}
-		}
-		while(!instructionBuffer.isEmpty()){
-			runCycle();
-			for(Instruction ins: instructionsToBeWritten){
-				writeBack(ins);
-			}
-		}
+		
 	}
 
 

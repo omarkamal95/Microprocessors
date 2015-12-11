@@ -24,11 +24,11 @@ public class ProgramData {
 	
 	private static int pipelineWidth;
 	private static int InstructionBufferSize;
-	private static int RScount;
 	private static int ROBcount;
-	private static int FUcycles;
 	private static int mmcycleTime;
 	private static MainMemory memory;
+	private static int loadCount,uncondCount,condCount,callCount,arithmeticCount;
+	private static int uncondCycle,coCycle,clCycle,arithmeticCycle,origin;
 	public static ArrayList<DCache> DCaches;
 	public static ArrayList<ICache> ICaches;
 	private static String [] assembly;
@@ -45,7 +45,7 @@ public class ProgramData {
 			public void run() {
 				try {
 					ProgramData window = new ProgramData(DCaches, ICaches, mmcycleTime, pipelineWidth, InstructionBufferSize,
-							RScount, ROBcount, FUcycles, assembly);
+							 ROBcount, loadCount, uncondCount, condCount,callCount, arithmeticCount,uncondCycle,coCycle,clCycle,arithmeticCycle, assembly,origin);
 					window.frame.setVisible(true);
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -57,16 +57,23 @@ public class ProgramData {
 	/**
 	 * Create the application.
 	 */
-	public ProgramData(ArrayList<DCache> d, ArrayList<ICache> i, int m, int p, int ibs, int rsc, int rob, int fuc, String[] ass) {
+	public ProgramData(ArrayList<DCache> d, ArrayList<ICache> i, int m, int p, int ibs, int rob,int ld, int un, int cn, int call, int arth, int uncondCycle,int coCycle ,int clCycle, int arithmeticCycle, String[] ass,int origin) {
 		DCaches = d;
 		ICaches = i;
 		mmcycleTime = m;
 		pipelineWidth = p;
 		InstructionBufferSize = ibs;
-		RScount = rsc;
-		ROBcount = rob;
-		FUcycles = fuc;
+		loadCount = ld;
+		uncondCount = un;
+		condCount = cn;
+		callCount = call;
+		arithmeticCount = arth;		ROBcount = rob;
 		assembly = ass;
+		this.uncondCycle = uncondCycle;
+		this.coCycle = coCycle;
+		this.clCycle = clCycle;
+		this.arithmeticCycle = arithmeticCycle;
+		this.origin = origin;
 		initialize();
 	}
 
@@ -123,7 +130,10 @@ public class ProgramData {
 			public void actionPerformed(ActionEvent e) {
 				Data.add(Integer.parseInt(textField.getText()), textField_1.getText());
 				MainMemory m = new MainMemory(mmcycleTime);
-				Main main = new Main(DCaches, ICaches, m, pipelineWidth, InstructionBufferSize, RScount, ROBcount, FUcycles, assembly, Data);
+				Main main = new Main(DCaches, ICaches, m, pipelineWidth, InstructionBufferSize, ROBcount, loadCount, uncondCount, condCount,callCount, arithmeticCount,uncondCycle,coCycle,clCycle,arithmeticCycle, assembly,origin, Data);
+				output o = new output(main);
+				o.NewScreen();
+				frame.setVisible(false);
 			}
 		});
 		springLayout.putConstraint(SpringLayout.EAST, btnDone, -10, SpringLayout.EAST, frame.getContentPane());
