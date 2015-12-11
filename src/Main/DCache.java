@@ -17,7 +17,8 @@ public class DCache {
 	
 	private String [][] content;
 	private String [] tag;
-	private int [] valid, dirty;
+	private int [] valid;
+	private int [][] dirty;
 	private int bufferSize, index, offset;
 	private int misses = 0,hits= 0;
 	private ArrayList<java.util.Date> lastUsed= new ArrayList<java.util.Date> ();
@@ -35,7 +36,7 @@ public class DCache {
 		valid = new int [0];
 		bufferSize = 0;
 		replacementPolicy = 0;
-		dirty = new int [0];
+		dirty = new int [0][0];
 	}
 
 	public DCache(int s, int b, int a, int t, int whp,int rp, int bs){
@@ -48,19 +49,40 @@ public class DCache {
 		tag = new String [size/bytesBlock];
 		valid = new int [size/bytesBlock];
 		replacementPolicy = rp;
-		if(writeHitPolicy == 1){
+		if(writeHitPolicy == 2){
 			bufferSize = bs;
 		}
-		if (writeHitPolicy == 0){
-			dirty = new int [size/bytesBlock];
+		if (writeHitPolicy == 1){
+			dirty = new int [size/bytesBlock][bytesBlock];
 		}
 		 index = (int) Math.ceil(Math.log10(size/bytesBlock)/Math.log10(2));
 		 offset = (int) Math.ceil(Math.log10(bytesBlock)/Math.log10(2));
 	}
 	
 	
-	private void write(int address, String data) {
+	public boolean write(int address, String data) {
+		String addr = Main.integerToBinary(address);
+		String addrIndex = addr.substring(addr.length() - index - offset, addr.length()- offset);
+		String addrOffset = addr.substring(addr.length() - offset, addr.length());
+		String addrTag = addr.substring(0, addr.length() - index - offset);
+		 
+		//to done , what is the buffer size and implement write backs
 		
+		int intAddr = Main.binaryToInteger(addrIndex);
+		int intOffset = Main.binaryToInteger(addrOffset);
+		int startIndex = intAddr*associativity;
+		for(int i = 0; i< associativity; i++){
+			if(valid[startIndex] == 1){
+				if(tag[startIndex].equals(addrTag)){
+					lastUsed.set(startIndex, new java.util.Date());
+					content[startIndex][intOffset] = data;
+					dirty [startIndex][intOffset] = 1;
+					return true;
+				}
+			}
+			startIndex ++;
+		}
+		return false;
 
 	}
 	
@@ -92,6 +114,7 @@ public class DCache {
 				if(valid[startIndex] == 0){
 					tag[startIndex] = addrTag;
 					content [startIndex][intOffset] = data;
+					valid[startIndex] = 1;
 					added = true;
 					lastUsed.set(startIndex, new java.util.Date());
 				}
@@ -115,11 +138,13 @@ public class DCache {
 				tag[replaceInd] = addrTag;
 				content [replaceInd][intOffset] = data;
 				added = true;
+				valid[replaceInd] = 1;
 				lastUsed.set(replaceInd, new java.util.Date());
 			}
 			else {
 				tag[startIndex] = addrTag;
 				content [startIndex][intOffset] = data;
+				valid[startIndex] = 1;
 				added = true;
 				lastUsed.set(startIndex, new java.util.Date());
 			}

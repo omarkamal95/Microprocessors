@@ -9,43 +9,88 @@ public class Instruction {
 	/*1 = Ready to issue, 2= Ready to calculate,
 	 3 = Ready to execute, 4 = executing, 5 = Ready to write, 6 = writing, 7 = Ready to commit  */
 	int state;
-	
+	int pcPos;
 	String rs,rt,rd;
 	int executionCycles;
 	int writeBackCycles;
+	int resStationIndex;
 	
-	public Instruction(int type, int state, String rs, String rt, String rd){
-		//to be done
+	public Instruction(int type, String rs, String rt, String rd){
+		this.type = type;
+		this.state = 1;
+		this.rs = rs;
+		this.rt = rt;
+		this.rd = rd;
 	}
 	
 	public int getAddress(){
-		if(rs.equalsIgnoreCase("R1")){
-			Main.R1 = Main.R1 + Integer.parseInt(rt);
-			return Main.R1;
+		if(type == 1){
+			if(rs.equalsIgnoreCase("R0")){
+				int res = Main.R0 + Integer.parseInt(rt);
+				return res;
+			}
+			if(rs.equalsIgnoreCase("R1")){
+				int res = Main.R1 + Integer.parseInt(rt);
+				return res;
+			}
+			if(rs.equalsIgnoreCase("R2")){
+				int res = Main.R2 + Integer.parseInt(rt);
+				return res;
+			}
+			if(rs.equalsIgnoreCase("R3")){
+				int res = Main.R3 + Integer.parseInt(rt);
+				return res;
+			}
+			if(rs.equalsIgnoreCase("R4")){
+				int res = Main.R4 + Integer.parseInt(rt);
+				return res;
+			}
+			if(rs.equalsIgnoreCase("R5")){
+				int res = Main.R5 + Integer.parseInt(rt);
+				return res;
+			}
+			if(rs.equalsIgnoreCase("R6")){
+				int res = Main.R6 + Integer.parseInt(rt);
+				return res;
+			}
+			if(rs.equalsIgnoreCase("R7")){
+				int res = Main.R7 + Integer.parseInt(rt);
+				return res;
+			}
 		}
-		if(rs.equalsIgnoreCase("R2")){
-			Main.R2 = Main.R2 + Integer.parseInt(rt);
-			return Main.R2;
-		}
-		if(rs.equalsIgnoreCase("R3")){
-			Main.R3 = Main.R3 + Integer.parseInt(rt);
-			return Main.R3;
-		}
-		if(rs.equalsIgnoreCase("R4")){
-			Main.R4 = Main.R4 + Integer.parseInt(rt);
-			return Main.R4;
-		}
-		if(rs.equalsIgnoreCase("R5")){
-			Main.R5 = Main.R5 + Integer.parseInt(rt);
-			return Main.R5;
-		}
-		if(rs.equalsIgnoreCase("R6")){
-			Main.R6 = Main.R6 + Integer.parseInt(rt);
-			return Main.R6;
-		}
-		if(rs.equalsIgnoreCase("R7")){
-			Main.R7 = Main.R7 + Integer.parseInt(rt);
-			return Main.R7;
+		else if(type == 2){
+			if(rs.equalsIgnoreCase("R0")){
+				int res = Main.R0 + Integer.parseInt(rd);
+				return res;
+			}
+			if(rs.equalsIgnoreCase("R1")){
+				int res = Main.R1 + Integer.parseInt(rd);
+				return res;
+			}
+			if(rs.equalsIgnoreCase("R2")){
+				int res = Main.R2 + Integer.parseInt(rd);
+				return res;
+			}
+			if(rs.equalsIgnoreCase("R3")){
+				int res = Main.R3 + Integer.parseInt(rd);
+				return res;
+			}
+			if(rs.equalsIgnoreCase("R4")){
+				int res = Main.R4 + Integer.parseInt(rd);
+				return res;
+			}
+			if(rs.equalsIgnoreCase("R5")){
+				int res = Main.R5 + Integer.parseInt(rd);
+				return res;
+			}
+			if(rs.equalsIgnoreCase("R6")){
+				int res = Main.R6 + Integer.parseInt(rd);
+				return res;
+			}
+			if(rs.equalsIgnoreCase("R7")){
+				int res = Main.R7 + Integer.parseInt(rd);
+				return res;
+			}
 		}
 		
 		return 0;
