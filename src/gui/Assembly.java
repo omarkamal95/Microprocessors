@@ -115,7 +115,9 @@ public class Assembly {
 				{
 					System.out.println(assembly[i]);	
 				}
-			
+				ProgramData p = new ProgramData(DCaches, ICaches, mmcycleTime, pipelineWidth, InstructionBufferSize, RScount, ROBcount, FUcycles, assembly);
+				p.NewScreen();
+				frame.setVisible(false);
 			}
 		});
 		springLayout.putConstraint(SpringLayout.WEST, btnNext, 0, SpringLayout.EAST, textArea);
