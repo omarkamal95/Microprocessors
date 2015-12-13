@@ -8,8 +8,11 @@ import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
 
+import Main.Instruction;
 import Main.Main;
+import Main.MainMemory;
 import Main.ROBentry;
+import Main.Unit;
 
 import javax.swing.JButton;
 import javax.swing.JScrollPane;
@@ -18,6 +21,7 @@ import javax.swing.JTable;
 
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import java.util.ArrayList;
 
 public class output extends JFrame {
 
@@ -35,6 +39,12 @@ public class output extends JFrame {
 
 	private JPanel contentPane;
 	private ROBentry []ROB;
+	private ArrayList<Instruction> instructionBuffer;
+	private ArrayList<Unit> RS;
+	private int [] RegSt; 
+	private int ROBhead;
+	private int ROBtail;
+	private MainMemory memory;
 
 	/**
 	 * Launch the application.
@@ -265,17 +275,54 @@ public class output extends JFrame {
 		
 		btnRunCycle.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
+			    tableModel.setRowCount(0);
+			    tableModel1.setRowCount(0);
+			    tableModel2.setRowCount(0);
+			    tableModel3.setRowCount(0);
+			    tableModel4.setRowCount(0);
+			    tableModel5.setRowCount(0);
+
+
 				main.run();
 				ROB = main.getROB();
-//				System.out.println(""+ROB[1].getInstruction());
-//				System.out.println(Main.getR1());
+				instructionBuffer = main.getInstructionBuffer();
+				RS = main.getRS();
+				RegSt = main.getRegSt(); 
+				ROBhead = main.getROBhead();
+				ROBtail = main.getROBtail();
+				memory = main.getMemory();
+				String [] memoryData = memory.getMemory();
+				int r0 = Main.getR0();
+				int r1 = Main.getR1();
+				int r2 = Main.getR2();
+				int r3 = Main.getR3();
+				int r4 = Main.getR4();
+				int r5 = Main.getR5();
+				int r6 = Main.getR6();
+				int r7 = Main.getR7();
+
 
 				for(int i = 1; i<ROB.length; i++){
-					if(ROB[i].getInstruction() != 0)
-				 tableModel.addRow(new Object[]{""+ROB[i].getInstruction(),ROB[i].getDest()});
+				 tableModel.addRow(new Object[]{""+ROB[i].getInstruction(),ROB[i].getDest(),""+ ROB[i].getValue(),""+ ROB[i].isReady()});
 				}
+				for(Instruction ins : instructionBuffer){
+					tableModel1.addRow(new Object[]{""+ ins.getType(),""+ ins.getState(),""+ins.getPcPos(),ins.getRs(),ins.getRt(),ins.getRd(),""+ins.getExecutionCycles(),""+ ins.getWriteBackCycles(),""+ ins.getResStationIndex()});
+				}
+				for(Unit u:RS){
+					tableModel2.addRow(new Object[]{""+ u.getUnitType(),""+ u.isBusy(),""+ u.getOp(),u.getVj(),u.getVk(),""+ u.getQj(),u.getQk(),""+u.getDest()});
+				}
+				
+				tableModel3.addRow(new Object[]{"" + r0, ""+r1, ""+r2, ""+r3, ""+r4, ""+r5, ""+r6, ""+r7});
+				tableModel4.addRow(new Object[]{"" + ROBhead, ""+ROBtail});
+				
+				for(int i = 0; i<memoryData.length; i++){
+					tableModel5.addRow(new Object[]{"" + i, ""+memoryData[i]});
+
+				}
+				
 			}
 		});
 
 	}
 }
+

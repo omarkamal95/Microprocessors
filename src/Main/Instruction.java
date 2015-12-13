@@ -95,5 +95,77 @@ public class Instruction {
 		
 		return 0;
 	}
+
+	public int getType() {
+		return type;
+	}
+
+	public void setType(int type) {
+		this.type = type;
+	}
+
+	public int getState() {
+		return state;
+	}
+
+	public void setState(int state) {
+		this.state = state;
+	}
+
+	public int getPcPos() {
+		return pcPos;
+	}
+
+	public void setPcPos(int pcPos) {
+		this.pcPos = pcPos;
+	}
+
+	public String getRs() {
+		return rs;
+	}
+
+	public void setRs(String rs) {
+		this.rs = rs;
+	}
+
+	public String getRt() {
+		return rt;
+	}
+
+	public void setRt(String rt) {
+		this.rt = rt;
+	}
+
+	public String getRd() {
+		return rd;
+	}
+
+	public void setRd(String rd) {
+		this.rd = rd;
+	}
+
+	public int getExecutionCycles() {
+		return executionCycles;
+	}
+
+	public void setExecutionCycles(int executionCycles) {
+		this.executionCycles = executionCycles;
+	}
+
+	public int getWriteBackCycles() {
+		return writeBackCycles;
+	}
+
+	public void setWriteBackCycles(int writeBackCycles) {
+		this.writeBackCycles = writeBackCycles;
+	}
+
+	public int getResStationIndex() {
+		return resStationIndex;
+	}
+
+	public void setResStationIndex(int resStationIndex) {
+		this.resStationIndex = resStationIndex;
+	}
 	
 }
