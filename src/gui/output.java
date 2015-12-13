@@ -22,6 +22,8 @@ import javax.swing.JTable;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
 public class output extends JFrame {
 
@@ -31,6 +33,8 @@ public class output extends JFrame {
 	private DefaultTableModel tableModel3;
 	private DefaultTableModel tableModel4;
 	private DefaultTableModel tableModel5;
+	private DefaultTableModel tableModel6;
+
 
 
 
@@ -56,6 +60,7 @@ public class output extends JFrame {
 	private JTable table_3;
 	private JTable table_4;
 	private JTable table_5;
+	private JTable table_6;
 	public static void NewScreen() {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
@@ -85,6 +90,7 @@ public class output extends JFrame {
 		contentPane.setLayout(null);
 
 		JButton btnRunCycle = new JButton("Run Cycle");
+		
 		
 		btnRunCycle.setBounds(657, 523, 117, 25);
 		contentPane.add(btnRunCycle);
@@ -273,14 +279,54 @@ public class output extends JFrame {
 		lblMemory.setBounds(460, 327, 70, 15);
 		contentPane.add(lblMemory);
 		
-		btnRunCycle.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
+		JScrollPane scrollPane_6 = new JScrollPane();
+		scrollPane_6.setBounds(51, 478, 255, 64);
+		contentPane.add(scrollPane_6);
+		
+		table_6 = new JTable();
+		scrollPane_6.setViewportView(table_6);
+		
+		JPanel northPanel6 = new JPanel();
+		JLabel lblField222 = new JLabel("R0  ");
+		JLabel lblField232 = new JLabel("R1  ");
+		JLabel lblField242 = new JLabel("R2   ");
+		JLabel lblField252 = new JLabel("R3  ");
+		JLabel lblField262 = new JLabel("R4   ");
+		JLabel lblField272 = new JLabel("R5  ");
+		JLabel lblField282 = new JLabel("R6 ");
+		JLabel lblField292 = new JLabel("R7  ");
+
+
+		northPanel6.add(lblField222);
+		northPanel6.add(lblField232);
+		northPanel6.add(lblField242);
+		northPanel6.add(lblField252);
+		northPanel6.add(lblField262);
+		northPanel6.add(lblField272);
+		northPanel6.add(lblField282);
+		northPanel6.add(lblField292);
+
+		getContentPane().add(northPanel6, BorderLayout.NORTH);
+		getContentPane().add(scrollPane_6,BorderLayout.CENTER);
+		tableModel6 = new DefaultTableModel(new Object[]{"r0","r1","r2","r3","r4","r5","r6","r7"},0);
+		tableModel6.addRow(new Object[]{"asddsa","eefefe","ds","sd","das","asddas","asddsa","sds"});
+		table_6.setModel(tableModel6);
+		
+		
+		JLabel lblRegisters = new JLabel("Registers");
+		lblRegisters.setBounds(108, 451, 70, 15);
+		contentPane.add(lblRegisters);
+		
+		btnRunCycle.addMouseListener(new MouseAdapter() {
+			public void mouseClicked(MouseEvent e) {
 			    tableModel.setRowCount(0);
 			    tableModel1.setRowCount(0);
 			    tableModel2.setRowCount(0);
 			    tableModel3.setRowCount(0);
 			    tableModel4.setRowCount(0);
 			    tableModel5.setRowCount(0);
+			    tableModel6.setRowCount(0);
+
 
 
 				main.run();
@@ -312,7 +358,9 @@ public class output extends JFrame {
 					tableModel2.addRow(new Object[]{""+ u.getUnitType(),""+ u.isBusy(),""+ u.getOp(),u.getVj(),u.getVk(),""+ u.getQj(),u.getQk(),""+u.getDest()});
 				}
 				
-				tableModel3.addRow(new Object[]{"" + r0, ""+r1, ""+r2, ""+r3, ""+r4, ""+r5, ""+r6, ""+r7});
+				tableModel6.addRow(new Object[]{"" + r0, ""+r1, ""+r2, ""+r3, ""+r4, ""+r5, ""+r6, ""+r7});
+				tableModel3.addRow(new Object[]{"" + RegSt[0], ""+RegSt[1], ""+RegSt[2], ""+RegSt[3], ""+RegSt[4], ""+RegSt[5], ""+RegSt[6], ""+RegSt[7]});
+
 				tableModel4.addRow(new Object[]{"" + ROBhead, ""+ROBtail});
 				
 				for(int i = 0; i<memoryData.length; i++){

@@ -568,6 +568,7 @@ public class Main {
 			ROB[ROBtail].dest = "branch";
 			ROB[ROBtail].ready = false;
 		}
+
 		ROBcounter++;
 		incrementTail();
 	}
@@ -712,9 +713,10 @@ public class Main {
 							RegSt[getRegisterNo(headEntry.dest)] = 0;
 						}
 					}
+					ROB[ROBhead] = new ROBentry();
+					incrementHead();
 				}
-				ROB[ROBhead] = new ROBentry();
-				incrementHead();
+				
 			}
 		}
 	}
@@ -776,17 +778,22 @@ public class Main {
 						if(ins.type == 1 || ins.type == 2){
 							for(Unit s : RS){
 								if(s.unitType == 1 && !s.busy){
+									ins.resStationIndex = RS.indexOf(s);
 									issue(ins);
 									ins.state++;
-									ins.resStationIndex = RS.indexOf(s);
+									break;
+
 								}
 							}
 						}
 						else if(ins.type == 3){
 							for(Unit s : RS){
 								if(s.unitType == 2 && !s.busy){
+									ins.resStationIndex = RS.indexOf(s);
 									issue(ins);
 									ins.state+=2;
+									break;
+
 								}
 							}
 
@@ -794,8 +801,11 @@ public class Main {
 						else if(ins.type == 4 ){
 							for(Unit s : RS){
 								if(s.unitType == 3 && !s.busy){
+									ins.resStationIndex = RS.indexOf(s);
 									issue(ins);
 									ins.state+=2;
+									break;
+
 								}
 							}
 
@@ -803,8 +813,11 @@ public class Main {
 						else if(ins.type == 5 || ins.type == 6){
 							for(Unit s : RS){
 								if(s.unitType == 4 && !s.busy){
+									ins.resStationIndex = RS.indexOf(s);
 									issue(ins);
 									ins.state+=2;
+									break;
+
 								}
 							}
 
@@ -812,8 +825,11 @@ public class Main {
 						else if(ins.type == 7 || ins.type == 8 || ins.type == 9 || ins.type == 10 || ins.type == 11){
 							for(Unit s : RS){
 								if(s.unitType == 5 && !s.busy){
+									ins.resStationIndex = RS.indexOf(s);
 									issue(ins);
 									ins.state+=2;
+
+									break;
 								}
 							}
 						}
@@ -953,19 +969,17 @@ public class Main {
 
 	public void run(){
 		int i = 0;
-		System.out.println("Pc "+pc);
-		System.out.println(memory.find(pc));
-		while(memory.getMemory()[pc]!= null && memory.getMemory()[pc]!= "" && i<pipelineWidth ){
+//		while(memory.getMemory()[pc]!= null && memory.getMemory()[pc]!= "" && i<pipelineWidth ){
+//			fetch();
+//			i++;
+//		}
+		if(memory.getMemory()[pc]!= null && memory.getMemory()[pc]!= ""){
 			fetch();
-			i++;
 		}
-			System.out.println("ins type"+instructionBuffer.get(0).type);
 			runCycle();
 			for(Instruction ins: instructionsToBeWritten){
-				System.out.println("aho");
 				writeBack(ins);
 			}
-			System.out.println("R1: " + R1);
 		
 	}
 

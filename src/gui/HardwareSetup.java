@@ -133,7 +133,7 @@ public class HardwareSetup {
 //				arithmeticCycle = Integer.parseInt(arthCycle.getText());
 				
 				//For testing
-				pipelineWidth = 2;
+				pipelineWidth = 1;
 				InstructionBufferSize = 10;
 				loadCount = 2;
 				condCount = 2;
