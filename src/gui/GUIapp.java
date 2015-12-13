@@ -101,9 +101,13 @@ public class GUIapp {
 		JButton btnNext = new JButton("Next");
 		btnNext.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				levelOfCaches = Integer.parseInt(textField.getText());
-				accessTime = Integer.parseInt(textField_1.getText());
-//				MainMemory m = new MainMemory(accessTime);
+//				levelOfCaches = Integer.parseInt(textField.getText());
+//				accessTime = Integer.parseInt(textField_1.getText());
+				
+				// for testing
+				levelOfCaches = 1;
+				accessTime = 10;
+				
 				CachesSetup c = new CachesSetup(accessTime, levelOfCaches);
 				c.NewScreen();
 				frame.setVisible(false);

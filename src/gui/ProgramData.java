@@ -32,7 +32,7 @@ public class ProgramData {
 	public static ArrayList<DCache> DCaches;
 	public static ArrayList<ICache> ICaches;
 	private static String [] assembly;
-	private static ArrayList<String> Data;
+	private static ArrayList<String> Data = new ArrayList<String>();
 	private JTextField textField;
 	private JTextField textField_1;
 	
@@ -128,7 +128,7 @@ public class ProgramData {
 		JButton btnDone = new JButton("Done");
 		btnDone.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				Data.add(Integer.parseInt(textField.getText()), textField_1.getText());
+//				Data.add(textField_1.getText());
 				MainMemory m = new MainMemory(mmcycleTime);
 				Main main = new Main(DCaches, ICaches, m, pipelineWidth, InstructionBufferSize, ROBcount, loadCount, uncondCount, condCount,callCount, arithmeticCount,uncondCycle,coCycle,clCycle,arithmeticCycle, assembly,origin, Data);
 				output o = new output(main);
@@ -142,7 +142,9 @@ public class ProgramData {
 		JButton btnMoreData = new JButton("More data");
 		btnMoreData.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				Data.add(Integer.parseInt(textField.getText()), textField_1.getText());
+		//		Data.add(Integer.parseInt(textField.getText()), textField_1.getText());
+				Data.add(2, "10");
+
 				NewScreen();
 				frame.setVisible(false);
 			}

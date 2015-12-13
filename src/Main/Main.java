@@ -15,6 +15,8 @@ public class Main {
 	int instructionBufferCounter = 0;
 	int instructionBufferSize;
 	int pc;
+	
+	ArrayList<Instruction> mark = new ArrayList<Instruction>();
 
 	ArrayList<Instruction> instructionsToBeWritten = new ArrayList<Instruction>();
 
@@ -51,6 +53,9 @@ public class Main {
 		assembly = a;
 		dataValue = data; // what is this?
 		ROB = new ROBentry [ROBentries+1];
+		for(int j = 1; j<= ROBentries ;j++){
+			ROB[j] = new ROBentry();
+		}
 		instructionBuffer = new ArrayList<Instruction>();
 		arithmeticExec = arithmeticCycle;
 		uncondBranchExec = uncondCycle;
@@ -392,6 +397,7 @@ public class Main {
 			ins.pcPos = branchPC;
 		}
 		instructionBuffer.add(ins);
+		instructionBufferCounter++;
 
 	}
 
@@ -503,6 +509,7 @@ public class Main {
 				RS.get(ins.resStationIndex).qj = 0;
 			}
 			else {
+				RS.get(ins.resStationIndex).vj = "";
 				RS.get(ins.resStationIndex).qj = h;
 			}
 		}
@@ -511,7 +518,8 @@ public class Main {
 			RS.get(ins.resStationIndex).qj = 0;
 		}
 
-		if((ins.type >= 7 && ins.type <=11) || ins.type == 2 || ins.type == 4){ 
+		if((ins.type >= 7 && ins.type <=11 && ins.type != 9) || ins.type == 2 || ins.type == 4){ 
+			//System.out.println("rt: " + ins.rt);
 			if(RegSt[getRegisterNo(ins.rt)] != 0){
 				int h = RegSt[getRegisterNo(ins.rt)];
 				if(ROB[h].ready){
@@ -519,6 +527,7 @@ public class Main {
 					RS.get(ins.resStationIndex).qk = 0;
 				}
 				else {
+					RS.get(ins.resStationIndex).vk = "";
 					RS.get(ins.resStationIndex).qk = h;
 				}
 			}
@@ -526,6 +535,16 @@ public class Main {
 				RS.get(ins.resStationIndex).vk = ins.rt;
 				RS.get(ins.resStationIndex).qk = 0;
 			}
+			
+			if(ins.type != 2 && ins.type != 4){
+				RegSt[getRegisterNo(ins.rd)] = ROBtail;
+			}
+		}
+		if(ins.type == 9){
+			RS.get(ins.resStationIndex).vk = ins.rt;
+			RS.get(ins.resStationIndex).qk = 0;
+		}
+		if(ins.type == 1){
 			RegSt[getRegisterNo(ins.rd)] = ROBtail;
 		}
 		if(ins.type != 2 && ins.type != 3 && ins.type != 4 && ins.type != 6){
@@ -609,7 +628,7 @@ public class Main {
 		}
 		else if(ins.type == 9){
 			res =""+ (getRegisterValue(RS.get(ins.resStationIndex).vj)  
-					+ Integer.parseInt(RS.get(ins.resStationIndex).vk));
+					+ Integer.parseInt(ins.rt));
 		}
 		else if(ins.type == 10){
 			res =""+ (NAND(getRegisterValue(RS.get(ins.resStationIndex).vj) 
@@ -749,7 +768,7 @@ public class Main {
 	public void runCycle(){
 		
 		commit();
-		
+
 		if(instructionBufferCounter >0){
 			for(Instruction ins: instructionBuffer){
 				if(ins.state == 1){
@@ -892,6 +911,7 @@ public class Main {
 				else if (ins.state == 5){
 					if(ins.type == 2){
 						if(RS.get(ins.resStationIndex).qk == 0){
+							System.out.println("aho "+ RS.get(ins.resStationIndex).vk);
 							int time = storeSim(ins.getAddress(),""+getRegisterValue(RS.get(ins.resStationIndex).vk));
 							ins.writeBackCycles = time;
 							ins.writeBackCycles --;
@@ -906,14 +926,14 @@ public class Main {
 							instructionsToBeWritten.add(ins);
 						}
 
-						instructionBuffer.remove(ins);
+						mark.add(ins);
 					}
 				}
 				else if (ins.state == 6){
 					if(ins.writeBackCycles == 0){
 						ins.state++;
 						instructionsToBeWritten.add(ins);
-						instructionBuffer.remove(ins);
+						mark.add(ins);
 					}
 					else {
 						ins.writeBackCycles--;
@@ -924,22 +944,269 @@ public class Main {
 
 
 		}
+		
+		for(Instruction ins : mark){
+			instructionBuffer.remove(ins);
+		}
+		mark.clear();
 	}
 
 	public void run(){
 		int i = 0;
+		System.out.println("Pc "+pc);
+		System.out.println(memory.find(pc));
 		while(memory.getMemory()[pc]!= null && memory.getMemory()[pc]!= "" && i<pipelineWidth ){
 			fetch();
 			i++;
 		}
+			System.out.println("ins type"+instructionBuffer.get(0).type);
 			runCycle();
 			for(Instruction ins: instructionsToBeWritten){
+				System.out.println("aho");
 				writeBack(ins);
 			}
+			System.out.println("R1: " + R1);
 		
 	}
 
 
+
+	public MainMemory getMemory() {
+		return memory;
+	}
+
+	public void setMemory(MainMemory memory) {
+		this.memory = memory;
+	}
+
+	public static int getR1() {
+		return R1;
+	}
+
+	public static void setR1(int r1) {
+		R1 = r1;
+	}
+
+	public static int getR2() {
+		return R2;
+	}
+
+	public static void setR2(int r2) {
+		R2 = r2;
+	}
+
+	public static int getR3() {
+		return R3;
+	}
+
+	public static void setR3(int r3) {
+		R3 = r3;
+	}
+
+	public static int getR4() {
+		return R4;
+	}
+
+	public static void setR4(int r4) {
+		R4 = r4;
+	}
+
+	public static int getR5() {
+		return R5;
+	}
+
+	public static void setR5(int r5) {
+		R5 = r5;
+	}
+
+	public static int getR6() {
+		return R6;
+	}
+
+	public static void setR6(int r6) {
+		R6 = r6;
+	}
+
+	public static int getR7() {
+		return R7;
+	}
+
+	public static void setR7(int r7) {
+		R7 = r7;
+	}
+
+	public ArrayList<DCache> getDcaches() {
+		return dcaches;
+	}
+
+	public void setDcaches(ArrayList<DCache> dcaches) {
+		this.dcaches = dcaches;
+	}
+
+	public ArrayList<ICache> getIcaches() {
+		return icaches;
+	}
+
+	public void setIcaches(ArrayList<ICache> icaches) {
+		this.icaches = icaches;
+	}
+
+	public ArrayList<Instruction> getInstructionBuffer() {
+		return instructionBuffer;
+	}
+
+	public void setInstructionBuffer(ArrayList<Instruction> instructionBuffer) {
+		this.instructionBuffer = instructionBuffer;
+	}
+
+	public int getInstructionBufferCounter() {
+		return instructionBufferCounter;
+	}
+
+	public void setInstructionBufferCounter(int instructionBufferCounter) {
+		this.instructionBufferCounter = instructionBufferCounter;
+	}
+
+	public int getInstructionBufferSize() {
+		return instructionBufferSize;
+	}
+
+	public void setInstructionBufferSize(int instructionBufferSize) {
+		this.instructionBufferSize = instructionBufferSize;
+	}
+
+	public int getPc() {
+		return pc;
+	}
+
+	public void setPc(int pc) {
+		this.pc = pc;
+	}
+
+	public ArrayList<Instruction> getInstructionsToBeWritten() {
+		return instructionsToBeWritten;
+	}
+
+	public void setInstructionsToBeWritten(
+			ArrayList<Instruction> instructionsToBeWritten) {
+		this.instructionsToBeWritten = instructionsToBeWritten;
+	}
+
+	public int getPipelineWidth() {
+		return pipelineWidth;
+	}
+
+	public void setPipelineWidth(int pipelineWidth) {
+		this.pipelineWidth = pipelineWidth;
+	}
+
+	public String[] getAssembly() {
+		return assembly;
+	}
+
+	public void setAssembly(String[] assembly) {
+		this.assembly = assembly;
+	}
+
+	public ArrayList<String> getDataValue() {
+		return dataValue;
+	}
+
+	public void setDataValue(ArrayList<String> dataValue) {
+		this.dataValue = dataValue;
+	}
+
+	public int getArithmeticExec() {
+		return arithmeticExec;
+	}
+
+	public void setArithmeticExec(int arithmeticExec) {
+		this.arithmeticExec = arithmeticExec;
+	}
+
+	public int getUncondBranchExec() {
+		return uncondBranchExec;
+	}
+
+	public void setUncondBranchExec(int uncondBranchExec) {
+		this.uncondBranchExec = uncondBranchExec;
+	}
+
+	public int getCondBranchExec() {
+		return condBranchExec;
+	}
+
+	public void setCondBranchExec(int condBranchExec) {
+		this.condBranchExec = condBranchExec;
+	}
+
+	public int getCallExec() {
+		return callExec;
+	}
+
+	public void setCallExec(int callExec) {
+		this.callExec = callExec;
+	}
+
+	public int getROBentries() {
+		return ROBentries;
+	}
+
+	public void setROBentries(int rOBentries) {
+		ROBentries = rOBentries;
+	}
+
+	public int[] getRegSt() {
+		return RegSt;
+	}
+
+	public void setRegSt(int[] regSt) {
+		RegSt = regSt;
+	}
+
+	public int getROBhead() {
+		return ROBhead;
+	}
+
+	public void setROBhead(int rOBhead) {
+		ROBhead = rOBhead;
+	}
+
+	public int getROBtail() {
+		return ROBtail;
+	}
+
+	public void setROBtail(int rOBtail) {
+		ROBtail = rOBtail;
+	}
+
+	public ArrayList<Unit> getRS() {
+		return RS;
+	}
+
+	public void setRS(ArrayList<Unit> rS) {
+		RS = rS;
+	}
+
+	public ROBentry[] getROB() {
+		return ROB;
+	}
+
+	public void setROB(ROBentry[] rOB) {
+		ROB = rOB;
+	}
+
+	public int getROBcounter() {
+		return ROBcounter;
+	}
+
+	public void setROBcounter(int rOBcounter) {
+		ROBcounter = rOBcounter;
+	}
+
+	public static int getR0() {
+		return R0;
+	}
 
 	public static void main (String [] args){
 		//		 java.util.Date date= new java.util.Date();

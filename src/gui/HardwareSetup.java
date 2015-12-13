@@ -119,18 +119,32 @@ public class HardwareSetup {
 		btnNext.setBounds(374, 561, 66, 25);
 		btnNext.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				pipelineWidth = Integer.parseInt(textField.getText());
-				InstructionBufferSize = Integer.parseInt(textField_1.getText());
-				loadCount = Integer.parseInt(loadField.getText());
-				condCount = Integer.parseInt(condField.getText());
-				uncondCount = Integer.parseInt(uncondField.getText());
-				callCount = Integer.parseInt(callbackField.getText());
-				arithmeticCount = Integer.parseInt(arithmeticField.getText());
-				ROBcount = Integer.parseInt(textField_3.getText());
-				uncondCycle = Integer.parseInt(unCycle.getText());
-				coCycle = Integer.parseInt(condCycle.getText());
-				clCycle = Integer.parseInt(callCycle.getText());
-				arithmeticCycle = Integer.parseInt(arthCycle.getText());;
+//				pipelineWidth = Integer.parseInt(textField.getText());
+//				InstructionBufferSize = Integer.parseInt(textField_1.getText());
+//				loadCount = Integer.parseInt(loadField.getText());
+//				condCount = Integer.parseInt(condField.getText());
+//				uncondCount = Integer.parseInt(uncondField.getText());
+//				callCount = Integer.parseInt(callbackField.getText());
+//				arithmeticCount = Integer.parseInt(arithmeticField.getText());
+//				ROBcount = Integer.parseInt(textField_3.getText());
+//				uncondCycle = Integer.parseInt(unCycle.getText());
+//				coCycle = Integer.parseInt(condCycle.getText());
+//				clCycle = Integer.parseInt(callCycle.getText());
+//				arithmeticCycle = Integer.parseInt(arthCycle.getText());
+				
+				//For testing
+				pipelineWidth = 2;
+				InstructionBufferSize = 10;
+				loadCount = 2;
+				condCount = 2;
+				uncondCount = 2;
+				callCount = 2;
+				arithmeticCount = 2;
+				ROBcount = 4;
+				uncondCycle = 4;
+				coCycle = 5;
+				clCycle = 3;
+				arithmeticCycle = 4;
 				
 				Assembly a = new Assembly(DCaches, ICaches, mmaccessTime, pipelineWidth, InstructionBufferSize, ROBcount, loadCount, uncondCount, condCount,callCount, arithmeticCount,uncondCycle,coCycle,clCycle,arithmeticCycle);
 				a.newScreen();

@@ -119,7 +119,7 @@ public class Assembly {
 		btnNext.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				text = textArea.getText();
-				assembly = text.split("//n");
+				assembly = text.split("\n");
 				origin = Integer.parseInt(originField.getText());
 				for(int i  = 0; i< assembly.length; i++)
 				{

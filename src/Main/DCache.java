@@ -51,6 +51,7 @@ public class DCache {
 		content = new String [size/bytesBlock][bytesBlock];
 		tag = new String [size/bytesBlock];
 		valid = new int [size/bytesBlock];
+		lastUsed= new ArrayList<Date>(size/bytesBlock);
 		replacementPolicy = rp;
 		if(writeHitPolicy == 2){
 			bufferSize = bs;
@@ -64,6 +65,9 @@ public class DCache {
 		}
 		 index = (int) Math.ceil(Math.log10(size/bytesBlock)/Math.log10(2));
 		 offset = (int) Math.ceil(Math.log10(bytesBlock)/Math.log10(2));
+		 for(int i = 0; i<size/bytesBlock; i++){
+		    	lastUsed.add(new java.util.Date());
+		    }
 	}
 	
 	

@@ -28,7 +28,7 @@ public class ICache {
 		valid = new int [0];
 	}
 
-	public ICache(int s, int b, int a, int t){
+	public ICache(int s, int b, int a, int t,int rp){
 		size = s;
 		bytesBlock = b;
 		associativity = a;
@@ -36,6 +36,11 @@ public class ICache {
 		content = new String [size/bytesBlock][bytesBlock];
 		tag = new String [size/bytesBlock];
 		valid = new int [size/bytesBlock];
+	    lastUsed= new ArrayList<java.util.Date> (size/bytesBlock);
+	    for(int i = 0; i<size/bytesBlock; i++){
+	    	lastUsed.add(new java.util.Date());
+	    }
+	   replacementPolicy = rp;
 	}
 	
 	public String find(int address){

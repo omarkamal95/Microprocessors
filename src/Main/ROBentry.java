@@ -17,4 +17,38 @@ public class ROBentry {
 		ready = false;
 		instruction = 0;
 	}
+
+	public String getDest() {
+		return dest;
+	}
+
+	public void setDest(String dest) {
+		this.dest = dest;
+	}
+
+	public String getValue() {
+		return value;
+	}
+
+	public void setValue(String value) {
+		this.value = value;
+	}
+
+	public boolean isReady() {
+		return ready;
+	}
+
+	public void setReady(boolean ready) {
+		this.ready = ready;
+	}
+
+	public int getInstruction() {
+		return instruction;
+	}
+
+	public void setInstruction(int instruction) {
+		this.instruction = instruction;
+	}
+	
+	
 }
